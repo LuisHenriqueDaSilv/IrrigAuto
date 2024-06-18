@@ -9,7 +9,6 @@
 
 Preferences preferences;
 
-
 RTC_DS3231 rtc;
 
 // const char* ssid = "CXR";  // Enter SSID here
@@ -1118,12 +1117,12 @@ void ligarDispositivo(int index){
   
   dispositivoEstaLigado = true;
   reles[index].esta_ligado = true;
-  digitalWrite(reles[index].porta, LOW);     
+  digitalWrite(reles[index].porta, HIGH);     
 }
 void desligarDispositivo(int index){
   dispositivoEstaLigado = false;
   reles[index].esta_ligado = false;
-  digitalWrite(reles[index].porta, HIGH);
+  digitalWrite(reles[index].porta, LOW);
 }
 
 bool verificarSeDeveEstarLigado(
@@ -1345,21 +1344,19 @@ void setup() {
   Serial.begin(9600);
 
            //Porta-estaligado-identificador-ligadoManualmente-DesligadoManualmente
-  reles[0] = {5, false, 1, false, false};
-  reles[1] = {4, false, 2, false, false};
-  reles[2] = {18, false, 3, false, false};
-  reles[3] = {19, false, 4, false, false};
-  reles[4] = {23, false, 5, false, false};
-  reles[5] = {15, false, 6, false, false};
-  reles[6] = {13, false, 7, false, false};
-  reles[7] = {14, false, 8, false, false};
-  reles[8] = {27, false, 9, false, false};
-  reles[9] = {26, false, 10, false, false};
-  reles[10] = {25, false, 11, false, false};
-  reles[11] = {33, false, 12, false, false};
+  reles[0] = {13, false, 1, false, false};
+  reles[1] = {15, false, 2, false, false};
+  reles[2] = {14, false, 3, false, false};
+  reles[3] = {4, false, 4, false, false};
+  reles[4] = {27, false, 5, false, false};
+  reles[5] = {5, false, 6, false, false};
+  reles[6] = {26, false, 7, false, false};
+  reles[7] = {18, false, 8, false, false};
+  reles[8] = {25, false, 9, false, false};
+  reles[9] = {19, false, 10, false, false};
+  reles[10] = {33, false, 11, false, false};
+  reles[11] = {23, false, 12, false, false};
   reles[12] = {32, false, 13, false, false};
-  // reles[13] = {1, false, 14, false, false};
-  
 
   for (int i = 0; i < NUM_RELES; i++) {
     pinMode(reles[i].porta, OUTPUT);
