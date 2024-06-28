@@ -1,0 +1,8 @@
+Armazenamento de rotinas:
+  Agora cada "parte"(Hora de ligar, hora de desligar, minuto de ligar e minuto de desligar) de uma rotina é salva em um um unico endereço
+  de memoria
+
+Todo: 
+  Adicionar forma de rastrear próximo momento de ligar dispositivo 
+  Adicionar sistema para não limpar a eeprom antes de salvar rotina (Segurança)
+  Adicionar sistema de erro nas páginas
