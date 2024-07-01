@@ -20,14 +20,15 @@ void RelayController::clientTurnOn(){
   turnOn();
   manuallyTurnedOn = true;
   manuallyTurnedOff = false;
-  server.sendHeader("Location", "/",true); 
-  server.send(302, "text/plain", "");
 }
 
 void RelayController::clientTurnOff(){
   turnOff();
   manuallyTurnedOn = false;
   manuallyTurnedOff = true;
-  server.sendHeader("Location", "/",true); 
-  server.send(302, "text/plain", "");
+}
+
+void RelayController::manuallyTurn(){
+  if(isOn){ clientTurnOff(); } else {clientTurnOn();}
+  server.send(200, "text/json", "");
 }

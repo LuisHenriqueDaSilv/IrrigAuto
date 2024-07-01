@@ -28,24 +28,50 @@ void saveRoutineInEEPROM(
 
 void saveRoutinesString(String routines){
   int routinesLenght = routines.length();
-  EEPROM.begin(EEPROM_SIZE);
-  for(int i = 0; i < routinesLenght/2; i+=2){
-    //                                    [i, i+2[
-    int routineBlock = atoi(routines.substring(i,i+2).c_str());
-    EEPROM.write(i, routineBlock);
+  int numberOfRoutines = getNumberOfRoutines(routines);
+  for(int i = 0; i < numberOfRoutines; i = i + 1){ 
+    int hourToTurnOn = atoi(routines.substring(i*8, i*8+2).c_str());
+    int minuteToTurnOn = atoi(routines.substring(i*8+2, i*8+4).c_str());
+    int hourToTurnOff = atoi(routines.substring(i*8+4, i*8+6).c_str());
+    int minuteToTurnOff = atoi(routines.substring(i*8+6, i*8+8).c_str());
+    saveRoutineInEEPROM(hourToTurnOn, minuteToTurnOn, hourToTurnOff, minuteToTurnOff);
   }
-  EEPROM.end(); 
 }
 
 void clearEEPROM(){
     EEPROM.begin(512);  
 
-  Serial.println("Limpando EEPROM!");
   for (int i = 0; i <= EEPROM_SIZE; i++) {
     EEPROM.write(i, 0);
   }
-  Serial.println("EEPROM apagada!");
-  EEPROM.write(FIRST_EEPROM_ADDRESS, (byte) 0);
   EEPROM.commit();
   EEPROM.end();
+}
+
+String getRoutinesInEEPROM(){
+  String routines = "";
+  bool endOfEEPROM = false;
+  int EEPROMAddressCounter = 0;
+
+  EEPROM.begin(EEPROM_SIZE);
+  while ( !endOfEEPROM ){
+    int hourToTurnON    = EEPROM.read(EEPROMAddressCounter );
+    int minuteToTurnOn  = EEPROM.read(EEPROMAddressCounter+1);
+    int hourToTurnOff   = EEPROM.read(EEPROMAddressCounter+2);
+    int minuteToTurnOFF = EEPROM.read(EEPROMAddressCounter+3);
+
+    if( hourToTurnON == 0 && minuteToTurnOn == 0 && hourToTurnOff == 0 && minuteToTurnOFF == 0 ) {
+      endOfEEPROM = true;
+      continue;
+    }
+    routines += (
+      numberToTwoChars(hourToTurnON)+
+      numberToTwoChars(minuteToTurnOn) + 
+      numberToTwoChars(hourToTurnOff) +
+      numberToTwoChars(minuteToTurnOFF)
+    );
+    EEPROMAddressCounter += 4;
+  }
+  EEPROM.end();
+  return routines;
 }

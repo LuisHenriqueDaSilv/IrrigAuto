@@ -44,14 +44,14 @@ void setup() {
 
 	server.on("/", [](){server.send(200, "text/html", Pages::landingPage());});
 	server.on("/configurar-relogio", [](){server.send(200, "text/html", Pages::clockAdjustPage());});
-	server.on("/configurar-horario", [](){server.send(200, "text/html", Pages::createRoutinePage());});
-	server.on("/excluir-horario", RoutinesController::delete_);
-	server.on("/limpar-horarios", RoutinesController::deleteAll);
-	server.on("/adicionar-horario", RoutinesController::create);
+	server.on("/configurar-rotina", [](){server.send(200, "text/html", Pages::createRoutinePage());});
+	server.on("/excluir-rotina", RoutinesController::delete_);
+	server.on("/apagar-rotinas", RoutinesController::deleteAll);
+	server.on("/adicionar-rotina", RoutinesController::create);
+	server.on("/rotinas", RoutinesController::readAll);
 	server.on("/setar-relogio", RTCController::configureClock);
 	server.on("/relogio", RTCController::readNow);
-	server.on("/ligar-manualmente", [](){relay.clientTurnOn();});
-	server.on("/desligar-manualmente", [](){relay.clientTurnOff();});
+  server.on("/mudar-rele", [](){relay.manuallyTurn();});
 	server.on("/status", [](){relay.getStatus();});
 
   server.begin();

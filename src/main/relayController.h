@@ -16,6 +16,8 @@
       void getStatus();
       void clientTurnOn();
       void clientTurnOff();
+      void manuallyTurn();
+      
   };
   
 #endif

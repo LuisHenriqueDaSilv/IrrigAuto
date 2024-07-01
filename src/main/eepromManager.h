@@ -5,7 +5,6 @@
 
   constexpr int EEPROM_SIZE = 512;
   constexpr int ROUTINE_LENGTH = 8;
-  constexpr uint8_t FIRST_EEPROM_ADDRESS = 8;
 
   void saveRoutineInEEPROM(
     int hourToTurnON,

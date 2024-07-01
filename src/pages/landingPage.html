@@ -1,0 +1,314 @@
+<html lang='pt-BR'>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>IrrigAuto</title>
+</head>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    text-align: center;
+    color: #403937;
+  }
+
+  :root {
+    font-size: 62.5%;
+  }
+
+  body {
+    background: linear-gradient(107.56deg, #5D5F28 0%, rgba(32, 90, 38, 0.557143) 32.29%, rgba(26, 87, 32, 0.264286) 53.65%, rgba(30, 30, 30, 0) 100%);
+    background-color: #1E1E1E;
+    overflow-x: hidden;
+  }
+
+  .wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .app {
+    height: 100vh;
+    max-width: 97.4rem;
+    padding: 2rem 1rem;
+    background-color: #D9D9D9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  header span {
+    font-size: 3.5rem;
+    font-weight: 700;
+    -webkit-text-stroke: .5px #403937a6;
+  }
+
+  header p {
+    font-size: 1.3rem;
+  }
+
+  button {
+    padding: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: 200ms;
+    font-size: 1.6rem;
+    border-radius: 10px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+    background: #C4C4C4;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+    opacity: 0.7;
+  }
+
+  .on {
+    color: #8AC880;
+  }
+
+  .off {
+    color: #D45C5C;
+  }
+
+  .offButton {
+    background-color: #8AC880;
+    color: #ffffff;
+  }
+
+  .onButton {
+    color: #ffffff;
+    background-color: #D45C5C;
+  }
+
+  .routinesContainer {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 10px;
+    background-color: #cecece;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+    padding: 1rem;
+  }
+
+  .routines {
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .routine {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border: solid .5px #4039372a;
+    border-radius: 10px;
+    padding: .5rem;
+    gap: 4rem;
+  }
+
+  .routine p {
+    font-size: 2rem;
+  }
+
+  .deleteRoutineButton {
+    width: 4rem;
+    height: 4rem;
+    margin-left: auto;
+    font-size: 1.5rem;
+    background: #B55454;
+  }
+
+  .routinesFooter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 60%;
+  }
+
+  a {
+    font-size: 1.5rem;
+  }
+
+  .clock {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-direction: row;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .clock div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #CDCDCD;
+    height: 5rem;
+    width: 5rem;
+    border-radius: 10px;
+    font-size: 2rem;
+  }
+
+  .clockSeparator {
+    font-size: 2rem;
+    align-self: center;
+  }
+</style>
+
+<body>
+  <div class='wrapper'>
+    <div class='app'>
+
+      <header>
+        <div>
+          <h1>O dispositivo está </h1>
+          <span class='on' id='status'>ligado</span>
+        </div>
+        <p>E permanecera assim até ser alterado por uma rotina configurada ou ser alterado manualmente.</p>
+        <button href='/desligar-manualmente' id='manualButton' class='onButton'>
+          desligar manualmente
+        </button>
+        <!-- <div>
+          <h1>O dispositivo está </h1>
+          <span class='off'>desligado</span>
+        </div>
+        <p>E permanecera assim até ser alterado por uma rotina configurada ou ser alterado manualmente.</p>
+        <button href='/desligar-manualmente' id='manualButton' class='offButton'>
+          ligar manualmente
+        </button> -->
+      </header>
+
+      <div class='routinesContainer'>
+        <h1>rotinas configuradas</h1>
+        <div class='routines'>
+          <div class='routine'>
+            <p><strong id='on'>00:00</strong> até <strong id='off'>00:00</strong></p>
+            <button 
+              class='deleteRoutineButton'
+              onclick='deleteRoutine(
+              
+              )'
+            > 🗑 </button>
+          </div>
+        </div>
+
+        <!-- <h1>ainda não existe nenhuma rotina configurada</h1> -->
+
+        <div class='routinesFooter'>
+          <button style="width:100%" href='/configurar-rotina'>adicionar rotina</button>
+          <button style="width:100%" href='/apagar-rotinas'>apagar rotinas</button>
+        </div>
+      </div>
+
+      <div>
+        <h1>horario atual:</h1>
+        <div class='clock'>
+          <div id='currentHour'>
+            00
+          </div> <label class='clockSeparator'>:</label>
+          <div id='currentMinute'>
+            00
+          </div>
+        </div>
+        <a href='/configurar-relogio'>configurar relogio</a>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+
+  async function fetchRoutines(){
+    const routinesResponse = await fetch("/rotinas");
+    const routinesResponseData = routinesResponse.json()
+    const routinesContainer = document.getElementsByClassName("routines")[0]
+    routinesContainer.innerHTML = ''
+    for(const i = 0; i< routinesResponseData.number; i++){
+      const turnOnHour = routines.substring(i*8, i*8+2);
+      const turnOnMinute = routines.substring(i*8+2, i*8+4);
+      const turnOffHour = routines.substring(i*8+4, i*8+6);
+      const turnOffMinute = routines.substring(i*8+6, i*8+8);
+      const newRoutinesContainerHtml = routinesContainer.innerHTML
+      newRoutinesContainerHtml + `
+      <div class='routine'>
+        <p><strong id='on'>${turnOnHour}:${turnOnMinute}</strong> até <strong id='off'>${turnOffHour}:${turnOffMinute}</strong></p>
+        <button 
+          class='deleteRoutineButton'
+          onclick='deleteRoutine(
+          ${turnOnHour}:${turnOnMinute}${turnOffHour}:${turnOffMinute}
+          )'
+        > 🗑 </button>
+      </div>
+      `
+      routinesContainer.innerHTML = newRoutinesContainerHtml
+    }
+  }
+  async function fetchDatas(){
+    const currentDate = await (await fetch('/relogio')).json()
+    window.document.getElementById('currentHour').innerHTML = currentDate.hora
+    window.document.getElementById('currentMinute').innerHTML = currentDate.minuto
+    const relayStatus = await (await fetch('/status')).json()
+    const statusDisplay = window.document.getElementById('status')
+    const manualButton = window.document.getElementById('manualButton')
+    if (relayStatus.status == 0) {
+      statusDisplay.innerHTML = 'desligado'
+      manualButton.innerHTML = 'ligar manualmente'
+      manualButton.className = 'offButton'
+    } else {
+      statusDisplay.innerHTML = 'ligado'
+      statusDisplay.id = 'ligado'
+      statusDisplay.className = 'on'
+      manualButton.innerHTML = 'desligar manualmente'
+      manualButton.className = 'onButton'
+    }
+  }
+  setInterval(fetchDatas, 5000)
+  async function deleteRoutine(routine) {
+    const turnOnHour  = routine.slice(0, 2)
+    const turnOnMinute = routine.slice(2, 4)
+    const turnOffHour  = routine.slice(4, 6)
+    const turnOffMinute = routine.slice(6, 8)
+    const usuarioConfirmouAExclusao = confirm(`deseja mesmo excluir a rotina de ${turnOnHour}:${turnOnMinute} até ${turnOffHour}:${turnOffMinute}?`)
+    if (usuarioConfirmouAExclusao) {
+      const horarioFormatadoParaEnvio = `${turnOnHour}${turnOnMinute}${turnOffHour}${turnOffMinute}`
+      const response = await fetch(`/excluir-rotina?horario=${horarioFormatadoParaEnvio}`);
+      if(response.status == 200){
+        fetchRoutines();
+      }
+    }
+  }
+
+  async function manuallyTurnRelay(){
+    const response = await fetch('/mudar-rele')
+    if(response.status == 200){
+      fetchDatas()
+    }
+  }
+
+  async function clearRoutines(){
+    const response = await fetch("/apagar-rotinas")
+    if(response.status == 200){
+      fetchRoutines()
+    }
+  }
+
+</script>
+
+</html>

@@ -2,6 +2,7 @@
 
 #include "relayController.h"
 #include "eepromManager.h"
+#include "utils.h"
 
 void RoutinesController::create(){
   String horaLiga1 = server.arg(0);
@@ -35,15 +36,21 @@ void RoutinesController::deleteAll(){
   server.send(302, "text/plain", "");
 }
 
+void RoutinesController::readAll(){
+  String routines = getRoutinesInEEPROM();
+  int numberOfRoutines = getNumberOfRoutines(routines);
+  String buf = "{ \"routines\": \"" + routines + "\", \"number\": \""+ numberOfRoutines +"\"}";
+  server.send(200, "text/json", buf);
+}
+
 void RoutinesController::delete_(){
   String routineToDelete = server.arg(0);
 
   String routines = getRoutinesInEEPROM();
   int indexOfRoutineToDelete = routines.indexOf(routineToDelete);
-  routines.remove(indexOfRoutineToDelete, 8);
+  routines.remove(indexOfRoutineToDelete, ROUTINE_LENGTH);
   clearEEPROM();
   saveRoutinesString(routines);
 
-  server.sendHeader("Location", "/",true); 
-  server.send(302, "text/plain", "");
+  server.send(200, "text/plain", "");
 }

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang='pt-BR'>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>IrrigAuto</title>
+</head>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    color: #403937;
+  }
+
+  :root {
+    font-size: 62.5%;
+  }
+
+  body {
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(107.56deg, #5D5F28 0%, rgba(32, 90, 38, 0.557143) 32.29%, rgba(26, 87, 32, 0.264286) 53.65%,
+        rgba(30, 30, 30, 0) 100%);
+    background-color: #1E1E1E;
+  }
+
+  .wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .app {
+    height: 100vh;
+    max-width: 97.4rem;
+    padding: 2rem 1rem;
+    background-color: #D9D9D9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .timer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .timer-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .timer-container div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 6rem;
+    height: 6rem;
+    background: #CDCDCD;
+    box-shadow: inset 4px 4px 4px rgba(0, 0, 0, 0.25);
+    font-size: 4rem;
+  }
+
+  .timer-container button {
+    margin-top: 0.2rem;
+    width: 100%;
+    height: 6rem;
+    background: #8AC880;
+    border: none;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    font-weight: 900;
+    font-size: 36px;
+    color: #ffffff;
+    cursor: pointer;
+    transition: 200ms;
+  }
+
+  .timer-container button:first-child {
+    border-radius: 10px 10px 0 0;
+  }
+
+  .timer-container button:last-child {
+    border-radius: 0 0 10px 10px;
+  }
+
+  .timer p {
+    font-size: 4rem;
+  }
+
+  .footer {
+    display: flex;
+    width: 100%;
+    max-width: 97.4rem;
+  }
+
+  .footer button {
+    border: 0;
+    border-radius: 10px 0 0 10px;
+    width: 100%;
+    padding: 1rem;
+    background-color: #3B64B2;
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 2rem;
+    text-decoration: none;
+    transition: 200ms;
+  }
+
+  #cancel-button {
+    border-radius: 0 10px 10px 0;
+    background-color: #B2433B;
+  }
+
+  @media (max-width: 952px) {
+    .app {
+      width: 100vw;
+    }
+  }
+  
+</style>
+
+<body>
+  <div class='wrapper'>
+    <div class='app'>
+      <h1>configure o relogio com o horario atual</h1>
+      <h1>horario atual:</h1>
+      <div class='timer'>
+        <div class='timer-container'>
+          <button onclick='somarHora(5)'>+5</button>
+          <button onclick='somarHora(1)'>+1</button>
+          <div id='hora'>00</div>
+          <button onclick='somarHora(-1)' style='background-color: #D45C5C;'>-1</button>
+          <button onclick='somarHora(-5)' style='background-color: #D45C5C;'>-5</button>
+        </div>
+        <p>:</p>
+        <div class='timer-container'>
+          <button onclick='somarMinutos(5)'>+5</button>
+          <button onclick='somarMinutos(1)'>+1</button>
+          <div id='minuto'>00</div>
+          <button onclick='somarMinutos(-1)' style='background-color: #D45C5C;'>-1</button>
+          <button onclick='somarMinutos(-5)' style='background-color: #D45C5C;'>-5</button>
+        </div>
+      </div>
+      <div class='footer'>
+        <button onclick='confirmar()'>confirmar</button>
+        <button onclick='cancelar()' id='cancel-button'>cancelar</button>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  // if(error){
+  //   error = false;
+  //   alert('
+  //   buf += mensagemdeErro;
+  //   ')
+  // }
+  let horas = 0
+  let minutos = 0
+  function atualizarDisplay() {
+    const displayMinutos = window.document.getElementById('minuto')
+    const displayHoras = window.document.getElementById('hora')
+    displayMinutos.innerHTML = minutos
+    displayHoras.innerHTML = horas
+  }
+  function somarHora(valor) {
+    if (horas + valor > 23) {
+      horas = 0
+    } else if (horas + valor < 0) {
+      horas = 23
+    } else {
+      horas = horas + valor
+    }
+    atualizarDisplay()
+  }
+  function somarMinutos(valor) {
+    if (minutos + valor > 59) {
+      minutos = 0
+    } else if (minutos + valor < 0) {
+      minutos = 59
+    } else {
+      minutos = minutos + valor
+    }
+    atualizarDisplay()
+  }
+  function cancelar() {
+    window.location.replace('/')
+  }
+  function confirmar() {
+    window.location.replace(`/setar-relogio?hora=${horas}&minuto=${minutos}`)
+  }
+</script>
+
+</html>

@@ -11,5 +11,6 @@
       static void create();
       static void delete_();
       static void deleteAll();
+      static void readAll();
   };
 #endif
