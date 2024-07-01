@@ -35,7 +35,7 @@ String Pages::clockAdjustPage(){
   buf += "  justify-content: center;";
   buf += "}";
   buf += ".app {";
-  buf += "  height: 100vh;";
+  buf += "  min-height: 100vh;";
   buf += "  max-width: 97.4rem;";
   buf += "  padding: 2rem 1rem;";
   buf += "  background-color: #D9D9D9;";
