@@ -16,8 +16,11 @@ void saveRoutineInEEPROM(
   // Sendo assim, todas as rotinas têm valor par.
   // Cada bloco da rotina é dado por um valor entre 0 e 60, sendo salvo em um endereço da EEPROM
   // Tornando viavel o seguinte cálculo:
-  int firstEmptyAddresInEEPROM = routines.length()/2; 
-  EEPROM.begin(EEPROM_SIZE);    
+  int firstEmptyAddresInEEPROM = routines.length()/2;
+  if(firstEmptyAddresInEEPROM+4 >= EEPROM_SIZE ){
+    return;
+  }
+  EEPROM.begin(EEPROM_SIZE);
   //           addrs                       value
   EEPROM.write(firstEmptyAddresInEEPROM,   hourToTurnON);
   EEPROM.write(firstEmptyAddresInEEPROM+1, minuteToTurnOn);
@@ -39,14 +42,15 @@ void saveRoutinesString(String routines){
 }
 
 void clearEEPROM(){
-    EEPROM.begin(512);  
+  EEPROM.begin(512);  
 
-  for (int i = 0; i <= EEPROM_SIZE; i++) {
+  for (int i = 0; i < EEPROM_SIZE; i++) {
     EEPROM.write(i, 0);
   }
   EEPROM.commit();
   EEPROM.end();
 }
+
 
 String getRoutinesInEEPROM(){
   String routines = "";
@@ -54,7 +58,7 @@ String getRoutinesInEEPROM(){
   int EEPROMAddressCounter = 0;
 
   EEPROM.begin(EEPROM_SIZE);
-  while ( !endOfEEPROM ){
+  while ( !endOfEEPROM && EEPROMAddressCounter < EEPROM_SIZE ){
     int hourToTurnON    = EEPROM.read(EEPROMAddressCounter );
     int minuteToTurnOn  = EEPROM.read(EEPROMAddressCounter+1);
     int hourToTurnOff   = EEPROM.read(EEPROMAddressCounter+2);

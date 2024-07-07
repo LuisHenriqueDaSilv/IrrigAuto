@@ -69,6 +69,7 @@ void setup() {
 
   Serial.println(WiFi.localIP());
   Serial.println();
+
 }
 
 void loop(){

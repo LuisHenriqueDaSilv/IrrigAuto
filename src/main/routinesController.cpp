@@ -28,7 +28,6 @@ void RoutinesController::create(){
 
 void RoutinesController::deleteAll(){
   clearEEPROM();
-  getRoutinesInEEPROM();
 
   relay.turnOff();
 
