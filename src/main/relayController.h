@@ -16,7 +16,8 @@
       void getStatus();
       void clientTurnOn();
       void clientTurnOff();
-      void manuallyTurn();
+      void manuallyToggleRelayState();
+      void physicallyToggleRelayState();
       
   };
   

@@ -16,8 +16,11 @@
 const char* ssid     = "sistema_de_irrigacao";
 const char* password = "123456789";
 
+#define MANUAL_BUTTON_PORT 5
+
 WebServer server(80);
 RelayController relay;
+SemaphoreHandle_t manualButtonSemaphore;
 
 void initWiFi() {
   // WiFi.mode(WIFI_STA);
@@ -37,10 +40,33 @@ void initWiFi() {
   WiFi.softAPConfig(local_ip, gateway, subnet);
 
 }
+
+volatile unsigned long lastClickTime = 0;
+#define DEBOUNCE_TIME 1000
+void IRAM_ATTR handleManualButton() {
+  unsigned long currentTime = millis();
+  if (currentTime - lastClickTime > DEBOUNCE_TIME) {
+    lastClickTime = currentTime;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(manualButtonSemaphore, &xHigherPriorityTaskWoken);
+    if (xHigherPriorityTaskWoken) {
+      portYIELD_FROM_ISR();
+    }
+  }
+}
+
 void setup() {
   Serial.begin(115200);
 	pinMode(relay.port, OUTPUT);
+  pinMode(MANUAL_BUTTON_PORT, INPUT_PULLUP);
   initWiFi();
+
+  attachInterrupt(digitalPinToInterrupt(MANUAL_BUTTON_PORT), handleManualButton, RISING);
+  manualButtonSemaphore = xSemaphoreCreateBinary();
+  if (manualButtonSemaphore == NULL) {
+    Serial.println("Failed to create semaphore");
+    while (1);
+  }
 
 	server.on("/", [](){server.send(200, "text/html", Pages::landingPage());});
 	server.on("/configurar-relogio", [](){server.send(200, "text/html", Pages::clockAdjustPage());});
@@ -51,7 +77,7 @@ void setup() {
 	server.on("/rotinas", RoutinesController::readAll);
 	server.on("/setar-relogio", RTCController::configureClock);
 	server.on("/relogio", RTCController::readNow);
-  server.on("/mudar-rele", [](){relay.manuallyTurn();});
+  server.on("/mudar-rele", [](){relay.manuallyToggleRelayState();});
 	server.on("/status", [](){relay.getStatus();});
 
   server.begin();
@@ -115,6 +141,10 @@ void loop(){
     relay.turnOn();
   } else if((!deviceMustBeTurnedOn && relay.isOn)) {
     relay.turnOff();
+  }
+
+  if (xSemaphoreTake(manualButtonSemaphore, 0) == pdTRUE) {
+    relay.physicallyToggleRelayState();
   }
 	
 	server.handleClient();

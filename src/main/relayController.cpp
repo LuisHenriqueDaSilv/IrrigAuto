@@ -28,7 +28,11 @@ void RelayController::clientTurnOff(){
   manuallyTurnedOff = true;
 }
 
-void RelayController::manuallyTurn(){
+void RelayController::manuallyToggleRelayState(){
   if(isOn){ clientTurnOff(); } else {clientTurnOn();}
   server.send(200, "text/json", "");
+}
+
+void RelayController::physicallyToggleRelayState(){
+  if(isOn){ clientTurnOff(); } else {clientTurnOn();}
 }
