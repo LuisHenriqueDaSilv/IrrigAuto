@@ -22,11 +22,3 @@ void RTCController::configureClock(){
   server.sendHeader("Location", "/",true); 
   server.send(302, "text/plain", "");
 }
-
-void RTCController::readNow(){
-  std::array<int, 3> now = getNow();
-  String hours = numberToTwoChars(now[0]);
-  String minutes = numberToTwoChars(now[1]);
-  String buf = "{ \"hora\" : \""+ hours + "\", \"minuto\" : \""+ minutes +"\" }";
-  server.send(200, "text/json", buf); 
-}

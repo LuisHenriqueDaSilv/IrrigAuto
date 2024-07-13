@@ -1,14 +1,17 @@
 #include "relayController.h"
 #include "Arduino.h"
+#include "webSocket.h"
 
 void RelayController::turnOff(){
   isOn = false;
   digitalWrite(port, LOW);
+  socketEmitRelayStatus();
 }
 
 void RelayController::turnOn(){
   isOn = true;
   digitalWrite(port, HIGH);
+  socketEmitRelayStatus();
 }
 
 void RelayController::getStatus(){
@@ -29,10 +32,5 @@ void RelayController::clientTurnOff(){
 }
 
 void RelayController::manuallyToggleRelayState(){
-  if(isOn){ clientTurnOff(); } else {clientTurnOn();}
-  server.send(200, "text/json", "");
-}
-
-void RelayController::physicallyToggleRelayState(){
   if(isOn){ clientTurnOff(); } else {clientTurnOn();}
 }

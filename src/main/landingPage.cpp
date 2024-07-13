@@ -13,7 +13,7 @@ String Pages::landingPage(){
   String buf = ""; 
 
   buf += "<html lang='pt-BR'>";
-  
+
   buf += "<head>";
   buf += "  <meta charset='UTF-8'>";
   buf += "  <meta http-equiv='X-UA-Compatible' content='IE=edge'>";
@@ -272,6 +272,44 @@ String Pages::landingPage(){
   buf += "</body>";
   buf += "<script>";
 
+  buf += "var socket = new WebSocket('ws://' + location.hostname + ':81/')\n";
+
+  buf += "function updateRelayStatus(status){\n";
+  buf += "  const statusDisplay = window.document.getElementById('status')\n";
+  buf += "  const manualButton = window.document.getElementById('manualButton')\n";
+  buf += "  if (status == 0) {\n";
+  buf += "    statusDisplay.innerHTML = 'desligado'\n";
+  buf += "    statusDisplay.className = 'off'\n";
+  buf += "    manualButton.innerHTML = 'ligar manualmente'\n";
+  buf += "    manualButton.className = 'offButton'\n";
+  buf += "  } else {\n";
+  buf += "    statusDisplay.innerHTML = 'ligado'\n";
+  buf += "    statusDisplay.className = 'on'\n";
+  buf += "    manualButton.innerHTML = 'desligar manualmente'\n";
+  buf += "    manualButton.className = 'onButton'\n";
+  buf += "  }\n";
+  buf += "}\n";
+
+  buf += "function updateClockDisplay(currentDate){\n";
+  buf += "  window.document.getElementById('currentHour').innerHTML = currentDate.hora\n";
+  buf += "  window.document.getElementById('currentMinute').innerHTML = currentDate.minuto\n";
+  buf += "}\n";
+
+  buf += "socket.onmessage = (event) => {\n";
+  buf += "  console.log(event)\n";
+  buf += "  const data = JSON.parse(event.data)\n";
+  buf += "  switch (data.event) {\n";
+  buf += "    case 'relayChange':\n";
+  buf += "      updateRelayStatus(data.buffer)\n";
+  buf += "      break;\n";
+  buf += "    case 'clockUpdate':\n";
+  buf += "      updateClockDisplay(data.buffer)\n";
+  buf += "      break;\n";
+  buf += "    default:\n";
+  buf += "      console.log('Evento desconhecido');\n";
+  buf += "  }\n";
+  buf += "}\n";
+
   buf += "async function loadRoutines(){\n";
   buf += "  const routinesResponse = await fetch('/rotinas');\n";
   buf += "  const routinesResponseData = await routinesResponse.json()\n";
@@ -298,26 +336,7 @@ String Pages::landingPage(){
   buf+= "  routinesContainer.innerHTML = '<h1>ainda não existe nenhuma rotina configurada</h1>'";
   buf+= "}";
   buf += "}\n";
-  buf += "async function fetchDatas(){\n";
-  buf += "  const currentDate = await (await fetch('/relogio')).json()\n";
-  buf += "  window.document.getElementById('currentHour').innerHTML = currentDate.hora\n";
-  buf += "  window.document.getElementById('currentMinute').innerHTML = currentDate.minuto\n";
-  buf += "  const relayStatus = await (await fetch('/status')).json()\n";
-  buf += "  const statusDisplay = window.document.getElementById('status')\n";
-  buf += "  const manualButton = window.document.getElementById('manualButton')\n";
-  buf += "  if (relayStatus.status == 0) {\n";
-  buf += "    statusDisplay.innerHTML = 'desligado'\n";
-  buf += "    statusDisplay.className = 'off'\n";
-  buf += "    manualButton.innerHTML = 'ligar manualmente'\n";
-  buf += "    manualButton.className = 'offButton'\n";
-  buf += "  } else {\n";
-  buf += "    statusDisplay.innerHTML = 'ligado'\n";
-  buf += "    statusDisplay.className = 'on'\n";
-  buf += "    manualButton.innerHTML = 'desligar manualmente'\n";
-  buf += "    manualButton.className = 'onButton'\n";
-  buf += "  }\n";
-  buf += "}\n";
-  buf += "setInterval(fetchDatas, 5000)\n";
+
   buf += "async function deleteRoutine(routine) {\n";
   buf += "  const turnOnHour  = routine.slice(0, 2)\n";
   buf += "  const turnOnMinute = routine.slice(2, 4)\n";
@@ -332,9 +351,8 @@ String Pages::landingPage(){
   buf += "  }\n";
   buf += "}\n";
 
-  buf += "async function manuallyTurnRelay(){\n";
-  buf += "  const response = await fetch('/mudar-rele')\n";
-  buf += "  fetchDatas()\n";
+  buf += "function manuallyTurnRelay(){\n";
+  buf += "  socket.send('mudar-rele')\n";
   buf += "}\n";
 
   buf += "async function clearRoutines(){\n";

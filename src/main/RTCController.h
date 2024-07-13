@@ -9,6 +9,5 @@
       static RTC_DS3231 rtc;
       static std::array<int, 3> getNow();
       static void configureClock();
-      static void readNow();
   };
 #endif
