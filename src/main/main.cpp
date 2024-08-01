@@ -6,6 +6,7 @@
 #include <RTClib.h>
 #include <array>
 
+
 #include "utils.h"
 #include "eepromManager.h"
 #include "pages.h"
@@ -13,6 +14,8 @@
 #include "routinesController.h"
 #include "relayController.h"
 #include "webSocket.h"
+
+
 
 const char* ssid     = "sistema_de_irrigacao";
 const char* password = "123456789";
