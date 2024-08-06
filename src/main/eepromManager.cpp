@@ -8,7 +8,8 @@ void saveRoutineInEEPROM(
   int hourToTurnON,
   int minuteToTurnOn,
   int hourToTurnOff,
-  int minuteToTurnOFF
+  int minuteToTurnOFF,
+  int relayIndex
 ){
   String routines = getRoutinesInEEPROM();
   // A string contendo todas as rotinas é dividida em rotinas de tamanho "ROUTINE_LENGTH".
@@ -26,6 +27,7 @@ void saveRoutineInEEPROM(
   EEPROM.write(firstEmptyAddresInEEPROM+1, minuteToTurnOn);
   EEPROM.write(firstEmptyAddresInEEPROM+2, hourToTurnOff);
   EEPROM.write(firstEmptyAddresInEEPROM+3, minuteToTurnOFF);
+  EEPROM.write(firstEmptyAddresInEEPROM+4, relayIndex);
   EEPROM.end();    
 }
 
@@ -33,11 +35,12 @@ void saveRoutinesString(String routines){
   int routinesLenght = routines.length();
   int numberOfRoutines = getNumberOfRoutines(routines);
   for(int i = 0; i < numberOfRoutines; i = i + 1){ 
-    int hourToTurnOn = atoi(routines.substring(i*8, i*8+2).c_str());
-    int minuteToTurnOn = atoi(routines.substring(i*8+2, i*8+4).c_str());
-    int hourToTurnOff = atoi(routines.substring(i*8+4, i*8+6).c_str());
-    int minuteToTurnOff = atoi(routines.substring(i*8+6, i*8+8).c_str());
-    saveRoutineInEEPROM(hourToTurnOn, minuteToTurnOn, hourToTurnOff, minuteToTurnOff);
+    int hourToTurnOn = atoi(routines.substring(i*ROUTINE_LENGTH, i*ROUTINE_LENGTH+2).c_str());
+    int minuteToTurnOn = atoi(routines.substring(i*ROUTINE_LENGTH+2, i*ROUTINE_LENGTH+4).c_str());
+    int hourToTurnOff = atoi(routines.substring(i*ROUTINE_LENGTH+4, i*ROUTINE_LENGTH+6).c_str());
+    int minuteToTurnOff = atoi(routines.substring(i*ROUTINE_LENGTH+6, i*ROUTINE_LENGTH+8).c_str());
+    int relayIndex = atoi(routines.substring(i*ROUTINE_LENGTH+8, i*ROUTINE_LENGTH+10).c_str());
+    saveRoutineInEEPROM(hourToTurnOn, minuteToTurnOn, hourToTurnOff, minuteToTurnOff, relayIndex);
   }
 }
 
@@ -63,6 +66,7 @@ String getRoutinesInEEPROM(){
     int minuteToTurnOn  = EEPROM.read(EEPROMAddressCounter+1);
     int hourToTurnOff   = EEPROM.read(EEPROMAddressCounter+2);
     int minuteToTurnOFF = EEPROM.read(EEPROMAddressCounter+3);
+    int relayIndex      = EEPROM.read(EEPROMAddressCounter+4);
 
     if( hourToTurnON == 0 && minuteToTurnOn == 0 && hourToTurnOff == 0 && minuteToTurnOFF == 0 ) {
       endOfEEPROM = true;
@@ -72,9 +76,10 @@ String getRoutinesInEEPROM(){
       numberToTwoChars(hourToTurnON)+
       numberToTwoChars(minuteToTurnOn) + 
       numberToTwoChars(hourToTurnOff) +
-      numberToTwoChars(minuteToTurnOFF)
+      numberToTwoChars(minuteToTurnOFF) +
+      numberToTwoChars(relayIndex)
     );
-    EEPROMAddressCounter += 4;
+    EEPROMAddressCounter += ROUTINE_LENGTH/2;
   }
   EEPROM.end();
   return routines;

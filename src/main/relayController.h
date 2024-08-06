@@ -1,13 +1,24 @@
-#include <WebServer.h>
-#include <WebSocketsServer.h>
+#include "interruptionHandlers.h"
+#include "webSocket.h"
+
 
 #ifndef RELAY_MANAGER_H
 #define RELAY_MANAGER_H
-  extern WebServer server;
-  extern WebSocketsServer webSocket;
+
+  #define NUMBER_OF_RELAYS 4
+
+  extern WebSocket webSocket;
   class RelayController {
     public:
-      const int port = 18;
+      RelayController();
+      RelayController(int port, int buttonPort, int id_);
+
+      static void emitStatus(int id, bool status);
+      static void toggleRelayById(int id);
+
+      int port;
+      int id;
+      int buttonPort;
       bool isOn;
       bool manuallyTurnedOn = false;
       bool manuallyTurnedOff = false;
@@ -15,11 +26,10 @@
       void turnOff();
       void turnOn();
       // Routes:
-      void getStatus();
       void clientTurnOn();
       void clientTurnOff();
       void manuallyToggleRelayState();
       
   };
-  
+  extern RelayController relays[NUMBER_OF_RELAYS];
 #endif

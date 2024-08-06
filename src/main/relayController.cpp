@@ -1,22 +1,33 @@
+#include <Arduino.h>
 #include "relayController.h"
-#include "Arduino.h"
-#include "webSocket.h"
+#include "utils.h"
+
+RelayController::RelayController(){};
+RelayController::RelayController(int port_, int buttonPort_, int id_){
+  port = port_;
+  buttonPort = buttonPort_;
+  id = id_;
+	pinMode(port_, OUTPUT);
+  pinMode(buttonPort_, INPUT_PULLUP);
+  digitalWrite(port_, LOW);
+  attachInterrupt(digitalPinToInterrupt(buttonPort), handleManualButtonChange, RISING );
+}
+
+void RelayController::emitStatus(int id, bool status){
+  String buffer = "{\"id\": \""+numberToTwoChars(id)+"\", \"isOn\":\""+String(status)+"\"}";
+  webSocket.emitEvent("{\"event\": \"relayChange\", \"buffer\": "+buffer+"}");
+}
 
 void RelayController::turnOff(){
   isOn = false;
   digitalWrite(port, LOW);
-  socketEmitRelayStatus();
+  emitStatus(id, isOn);
 }
 
 void RelayController::turnOn(){
   isOn = true;
   digitalWrite(port, HIGH);
-  socketEmitRelayStatus();
-}
-
-void RelayController::getStatus(){
-  String buf = "{ \"status\" : \""+ String(isOn) +  "\" }";
-  server.send(200, "text/json", buf); 
+  emitStatus(id, isOn);
 }
 
 void RelayController::clientTurnOn(){
@@ -29,6 +40,10 @@ void RelayController::clientTurnOff(){
   turnOff();
   manuallyTurnedOn = false;
   manuallyTurnedOff = true;
+}
+
+void RelayController::toggleRelayById(int id){
+  relays[id-1].manuallyToggleRelayState();
 }
 
 void RelayController::manuallyToggleRelayState(){

@@ -3,7 +3,7 @@
 #ifndef PAGES_H
 #define PAGES_H
   #include <Wire.h>
-  extern RelayController relay;
+  extern RelayController relays[NUMBER_OF_RELAYS];
   class Pages {
     public:
       static String landingPage();

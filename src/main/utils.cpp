@@ -1,5 +1,6 @@
 #include "utils.h"
 #include "eepromManager.h"
+#include <Arduino.h>
 
 bool checkIfItShouldbeTurnedOn(
   int currentMinuteOfTheDay, 
@@ -13,21 +14,23 @@ bool checkIfItShouldbeTurnedOn(
     manuallyTurnedOff = false;
   }
 
-  if(manuallyTurnedOn){ return true; }
-  if(manuallyTurnedOff){ return false; }
+  if(manuallyTurnedOn){Serial.println("a"); return true;  }
+  if(manuallyTurnedOff){Serial.println("b"); return false; }
 
   if(minuteOfTheDayToTurnOff > minuteOfTheDayToTurnOn){
     if(currentMinuteOfTheDay >= minuteOfTheDayToTurnOn && currentMinuteOfTheDay < minuteOfTheDayToTurnOff){
+      Serial.println("c");
       return true;
-    }else { return false; }
+    }else { return false; Serial.println("d"); }
   }else if(minuteOfTheDayToTurnOff < minuteOfTheDayToTurnOn) {
     int tempoQueODispositivoVaiFicarLigado = (minuteOfTheDayToTurnOff + 1440) - minuteOfTheDayToTurnOn;
     int minutosLigadoNoPrimeiroDia = 1440 - minuteOfTheDayToTurnOn; // 1440 é a quantidade de minutos em 24 horas
     int minutosLigadoNoSegundoDia =  tempoQueODispositivoVaiFicarLigado - minutosLigadoNoPrimeiroDia;
     if(currentMinuteOfTheDay >= minuteOfTheDayToTurnOn || currentMinuteOfTheDay < minutosLigadoNoSegundoDia){
+      Serial.println("e");
       return true;
-    } else { return false; }
-  } else { return false; }
+    } else { Serial.println("f"); return false;  }
+  } else { Serial.println("g"); return false; }
 }
 
 int getNumberOfRoutines(String routines){

@@ -57,24 +57,7 @@ String Pages::landingPage(){
   buf += "    gap: 3rem;";
   buf += "  }";
   
-  buf += "  header {";
-  buf += "    display: flex;";
-  buf += "    flex-direction: column;";
-  buf += "    align-items: center;";
-  buf += "    gap: 1rem;";
-  buf += "  }";
-  
-  buf += "  header span {";
-  buf += "    font-size: 3.5rem;";
-  buf += "    font-weight: 700;";
-  buf += "    -webkit-text-stroke: .5px #403937a6;";
-  buf += "  }";
-  
-  buf += "  header p {";
-  buf += "    font-size: 1.3rem;";
-  buf += "  }";
-  
-  buf += "  button {";
+  buf += "  .optionButton {";
   buf += "    padding: 1rem;";
   buf += "    border: none;";
   buf += "    cursor: pointer;";
@@ -96,16 +79,6 @@ String Pages::landingPage(){
   
   buf += "  .off {";
   buf += "    color: #D45C5C;";
-  buf += "  }";
-  
-  buf += "  .offButton {";
-  buf += "    background-color: #8AC880;";
-  buf += "    color: #ffffff;";
-  buf += "  }";
-  
-  buf += "  .onButton {";
-  buf += "    color: #ffffff;";
-  buf += "    background-color: #D45C5C;";
   buf += "  }";
   
   buf += "  .routinesContainer {";
@@ -147,6 +120,8 @@ String Pages::landingPage(){
   buf += "    margin-left: auto;";
   buf += "    font-size: 1.5rem;";
   buf += "    background: #B55454;";
+  buf += "    border: none;";
+  buf += "    border-radius: 10px;";
   buf += "  }";
   
   buf += "  .routinesFooter {";
@@ -185,49 +160,169 @@ String Pages::landingPage(){
   buf += "    font-size: 2rem;";
   buf += "    align-self: center;";
   buf += "  }";
+
+
+  buf += ".manualButtonsContainer {";
+  buf += "  display: grid;";
+  buf += "  grid-template-columns: repeat(5, 1fr);";
+  buf += "  width: 90vw;";
+  buf += "}";
+
+  buf += ".manualButtonsContainer button:first-child {";
+  buf += "  border-top-left-radius: 10px;";
+  buf += "}";
+
+  buf += ".manualButtonsContainer button:nth-child(4) {";
+  buf += "  border-top-right-radius: 10px;";
+  buf += "}";
+
+  buf += ".manualButtonsContainer button:last-child {";
+  buf += "  border-bottom-right-radius: 10px;";
+  buf += "}";
+
+  buf += ".manualButtonsContainer button:nth-child(5n + 1):nth-last-child(-n + 5) {";
+  buf += "  border-bottom-left-radius: 10px;";
+  buf += "}";
+
+  buf += ".relayManualButton {";
+  buf += "  border: 2px solid #ffffff;";
+  buf += "  padding: 0.5rem;";
+  buf += "  border-radius: 0;";
+  buf += "  color: #ffffff;";
+  buf += "  background-color: #dfdfdf;";
+  buf += "}";
+
+  buf += ".relayManualButton h1 {";
+  buf += "  font-size: 3rem;";
+  buf += "  color: #ffffff;";
+  buf += "}";
+
+  buf += ".relayManualButton p {";
+  buf += "	font-size: 1.5rem;";
+  buf += "	color: #ffffff;";
+  buf += "	font-weight: 600;";
+  buf += "}";
+
+  buf += ".relayManualButton label {";
+  buf += "  color: #ffffff;";
+  buf += "  font-size: 1.3rem;";
+  buf += "}";
+
+  buf += ".offButton {";
+  buf += "  background-color: #A64D4D;";
+  buf += "  color: #ffffff;";
+  buf += "}";
+
+  buf += ".onButton {";
+  buf += "  color: #ffffff;";
+  buf += "  background-color: #8AC87F;";
+  buf += "}";
+
+  buf += "header {";
+  buf += "  display: flex;";
+  buf += "  flex-direction: column;";
+  buf += "  align-items: center;";
+  buf += "  gap: 1rem;";
+  buf += "}";
+
+  buf += ".portIdentifier {";
+    buf += "    width: 4rem;";
+    buf += "    display: flex;";
+    buf += "    flex-direction: column;";
+    buf += "    justify-content: center;";
+    buf += "    align-itens: center;";
+    buf += "    height: 4rem;";
+    buf += "    margin-right: auto;";
+    buf += "    font-size: 1rem;";
+    buf += "    border: none;";
+    buf += "    border-radius: 10px;";
+  buf += "}";
+
+  buf += ".portIdentifier span {";
+  buf += "  font-size: 8px;";
+  buf += "}";
+
+  buf += ".portIdentifier * {";
+  buf += "  color: #ffffff;";
+  buf += "}";
+
+  buf += "header p {";
+  buf += "  font-size: 1.3rem;";
+  buf += "}";
+
   buf += "</style>";
   
   buf += "<body>";
   buf += "  <div class='wrapper'>";
   buf += "    <div class='app'>";
   
-  buf += "      <header>";
-  buf += "        <div>";
-  buf += "          <h1>O dispositivo está </h1>";
-  if(relay.isOn){
-    buf += "          <span class='on' id='status'>ligado</span>";
-  } else {
-    buf += "          <span class='off' id='status'>desligado</span>";
-  }
-  buf += "        </div>";
-  buf += "        <p>E permanecera assim até ser alterado por uma rotina configurada ou ser alterado manualmente.</p>";
-  if(relay.isOn){
-    buf += "        <button onclick='manuallyTurnRelay()' id='manualButton' class='onButton'>";
-    buf += "          desligar manualmente";
+  buf += "    <header class='header'>";
+  buf += "      <div class='manualButtonsContainer'>";
+
+  for(int i = 0; i<NUMBER_OF_RELAYS; i++){
+    buf += "        <button class='relayManualButton ";
+    if(relays[i].isOn){
+      buf+="onButton";
+    } else {
+      buf+="offButton";
+    }
+    buf+="' ";
+    buf+="id='relayManualButton-";
+    buf+=numberToTwoChars(relays[i].id);
+    buf+= "' ";
+    buf+="onclick='manuallyTurnRelay("+String(relays[i].id)+")'\n";
+    buf += "          <p>porta</p>";
+    buf += "          <h1>"+String(relays[i].id)+"</h1>";
+    buf += "          <label>";
+    if(relays[i].isOn){
+      buf+="ligado";
+    } else {
+      buf+="desligado";
+    }
+    buf+= "           </label>";
     buf += "        </button>";
-  } else {
-    buf += "        <button onclick='manuallyTurnRelay()' id='manualButton' class='offButton'>";
-    buf += "          ligar manualmente";
-    buf += "        </button>";
   }
-  buf += "      </header>";
+
+  buf += "      </div>";
+  buf += "      <p>";
+  buf += "        Toque em uma porta para alterar seu estado manualmente. A porta permanecerá nesse estado até que uma rotina ou nova alteração manual ocorra.";
+  buf += "      </p>";
+  buf += "    </header>  ";
+
   buf += "      <div class='routinesContainer'>";
   if(numberOfRoutines > 0){
     buf += "        <h1>rotinas configuradas</h1>";
     buf += "        <div class='routines'>";
     
-    for(int i = 0; i < numberOfRoutines; i = i + 1){ 
-      String turnOnHour = routines.substring(i*8, i*8+2);
-      String turnOnMinute = routines.substring(i*8+2, i*8+4);
-      String turnOffHour = routines.substring(i*8+4, i*8+6);
-      String turnOffMinute = routines.substring(i*8+6, i*8+8);
+    for(int i = 0; i < numberOfRoutines; i++){ 
+      String turnOnHour = routines.substring(i*ROUTINE_LENGTH, i*ROUTINE_LENGTH+2);
+      String turnOnMinute = routines.substring(i*ROUTINE_LENGTH+2, i*ROUTINE_LENGTH+4);
+      String turnOffHour = routines.substring(i*ROUTINE_LENGTH+4, i*ROUTINE_LENGTH+6);
+      String turnOffMinute = routines.substring(i*ROUTINE_LENGTH+6, i*ROUTINE_LENGTH+8);
+      String relayIndex = routines.substring(i*ROUTINE_LENGTH+8, i*ROUTINE_LENGTH+10);
+      bool relayIsOn = relays[atoi(relayIndex.c_str())-1].isOn;
 
       buf += "          <div class='routine'>";
-      buf += "            <p><strong id='on'>";
+
+      buf += "<div class='portIdentifier ";
+      buf += "portIdentifierN-" + relayIndex + " ";
+      if(relayIsOn){
+        buf+="onButton";
+      } else {
+        buf+="offButton";
+      }
+      buf += "'>";
+      buf += "  <span>porta</span>";
+      buf += "  <h1>";
+      buf +=      relayIndex;
+      buf += "  </h1>";
+      buf += "</div>";
+      
+      buf += "            <p><strong>";
       buf += turnOnHour;
       buf += ":";
       buf += turnOnMinute;
-      buf += "</strong> até <strong id='off'>";
+      buf += "</strong> até <strong>";
       buf += turnOffHour;
       buf += ":";
       buf += turnOffMinute;
@@ -247,11 +342,9 @@ String Pages::landingPage(){
   } else {
     buf += "        <h1>ainda não existe nenhuma rotina configurada</h1>";
   }
-
-  
   buf += "        <div class='routinesFooter'>";
-  buf += "          <a style='width:100%; heigth:100%;' href='/configurar-rotina'><button style='width:100%'>adicionar rotina</button></a>";
-  buf += "          <button style='width:100%' onclick='clearRoutines()'>apagar rotinas</button>";
+  buf += "          <a style='width:100%; heigth:100%;' href='/configurar-rotina'><button class='optionButton' style='width:100%'>adicionar rotina</button></a>";
+  buf += "          <button class='optionButton' style='width:100%' onclick='clearRoutines()'>apagar rotinas</button>";
   buf += "        </div>";
   buf += "      </div>";
   
@@ -274,19 +367,27 @@ String Pages::landingPage(){
 
   buf += "var socket = new WebSocket('ws://' + location.hostname + ':81/')\n";
 
-  buf += "function updateRelayStatus(status){\n";
-  buf += "  const statusDisplay = window.document.getElementById('status')\n";
-  buf += "  const manualButton = window.document.getElementById('manualButton')\n";
-  buf += "  if (status == 0) {\n";
-  buf += "    statusDisplay.innerHTML = 'desligado'\n";
-  buf += "    statusDisplay.className = 'off'\n";
-  buf += "    manualButton.innerHTML = 'ligar manualmente'\n";
-  buf += "    manualButton.className = 'offButton'\n";
+  buf += "function updateRelayStatus({isOn, id}){\n";
+  buf += "  const manualButton = window.document.getElementById(`relayManualButton-${id}`)\n";
+  buf += "  const manualButtonSpan = manualButton.getElementsByTagName('label')[0]\n";
+  buf += "  console.log(`portIdentifierN-${id}`)\n";
+  buf += "  const portIdentifiers = window.document.getElementsByClassName(`portIdentifierN-${id}`)\n";
+  buf += "  if (parseInt(isOn)) {\n";
+  buf += "    for(var i = 0; i<portIdentifiers.length; i++){\n";
+  buf += "      portIdentifiers[i].classList.remove('offButton')\n";
+  buf += "      portIdentifiers[i].classList.add('onButton')\n";
+  buf += "    }\n";
+  buf += "    manualButton.classList.add('onButton')\n";
+  buf += "    manualButton.classList.remove('offButton')\n";
+  buf += "    manualButtonSpan.innerHTML = 'ligado'\n";
   buf += "  } else {\n";
-  buf += "    statusDisplay.innerHTML = 'ligado'\n";
-  buf += "    statusDisplay.className = 'on'\n";
-  buf += "    manualButton.innerHTML = 'desligar manualmente'\n";
-  buf += "    manualButton.className = 'onButton'\n";
+  buf += "    manualButton.classList.remove('onButton')\n";
+  buf += "    manualButton.classList.add('offButton')\n";
+  buf += "    manualButtonSpan.innerHTML = 'desligado'\n";
+  buf += "    for(var i = 0; i<portIdentifiers.length; i++){\n";
+  buf += "      portIdentifiers[i].classList.remove('onButton')\n";
+  buf += "      portIdentifiers[i].classList.add('offButton')\n";
+  buf += "    }\n";
   buf += "  }\n";
   buf += "}\n";
 
@@ -310,31 +411,8 @@ String Pages::landingPage(){
   buf += "  }\n";
   buf += "}\n";
 
-  buf += "async function loadRoutines(){\n";
-  buf += "  const routinesResponse = await fetch('/rotinas');\n";
-  buf += "  const routinesResponseData = await routinesResponse.json()\n";
-  buf += "  const routinesContainer = document.getElementsByClassName('routines')[0]\n";
-  buf += "  routinesContainer.innerHTML = ''\n";
-  buf += "if(routinesResponseData.number > 0){";
-  buf += "  const routines = routinesResponseData.routines\n";
-  buf += "  for(let i = 0; i< routinesResponseData.number; i++){\n";
-  buf += "    const turnOnHour = routines.substring(i*8, i*8+2);\n";
-  buf += "    const turnOnMinute = routines.substring(i*8+2, i*8+4);\n";
-  buf += "    const turnOffHour = routines.substring(i*8+4, i*8+6);\n";
-  buf += "    const turnOffMinute = routines.substring(i*8+6, i*8+8);\n";
-  buf += "    document.getElementsByClassName('routines')[0].innerHTML += `\n";
-  buf += "    <div class='routine'>\n";
-  buf += "      <p><strong id='on'>${turnOnHour}:${turnOnMinute}</strong> até <strong id='off'>${turnOffHour}:${turnOffMinute}</strong></p>\n";
-  buf += "      <button \n";
-  buf += "        class='deleteRoutineButton'\n";
-  buf += "        onclick='deleteRoutine(\"${turnOnHour}${turnOnMinute}${turnOffHour}${turnOffMinute}\")'\n";
-  buf += "      > 🗑 </button>\n";
-  buf += "    </div>\n";
-  buf += "    `\n";
-  buf += "  }\n";
-  buf+= "} else {";
-  buf+= "  routinesContainer.innerHTML = '<h1>ainda não existe nenhuma rotina configurada</h1>'";
-  buf+= "}";
+  buf += "async function reloadPage(){\n";
+  buf += "  location.reload()\n";
   buf += "}\n";
 
   buf += "async function deleteRoutine(routine) {\n";
@@ -346,13 +424,12 @@ String Pages::landingPage(){
   buf += "  if (usuarioConfirmouAExclusao) {\n";
   buf += "    const horarioFormatadoParaEnvio = `${turnOnHour}${turnOnMinute}${turnOffHour}${turnOffMinute}`\n";
   buf += "    const response = await fetch(`/excluir-rotina?horario=${horarioFormatadoParaEnvio}`);\n";
-  buf += "    loadRoutines()\n";
-  buf += "    fetchDatas()\n";
+  buf += "    reloadPage()\n";
   buf += "  }\n";
   buf += "}\n";
 
-  buf += "function manuallyTurnRelay(){\n";
-  buf += "  socket.send('mudar-rele')\n";
+  buf += "async function manuallyTurnRelay(id){\n";
+  buf += "  fetch(`/mudar-rele?id=${id}`)\n";
   buf += "}\n";
 
   buf += "async function clearRoutines(){\n";
@@ -360,7 +437,7 @@ String Pages::landingPage(){
   buf += "  if (usuarioConfirmouAExclusao) {\n";
   buf += "    const response = await fetch('/apagar-rotinas')\n";
   buf += "    if(response.status == 200){\n";
-  buf += "      loadRoutines()\n";
+  buf += "      reloadPage()\n";
   buf += "    }\n";
   buf += "  }\n";
   buf += "}\n";

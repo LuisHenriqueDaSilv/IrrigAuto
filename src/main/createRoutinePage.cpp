@@ -1,4 +1,5 @@
 #include "pages.h"
+#include "utils.h"
 
 String Pages::createRoutinePage(){
   String buf = "";
@@ -127,12 +128,94 @@ String Pages::createRoutinePage(){
   buf += "  }";
   buf += "}";
 
+  buf += ".relaysContainer {";
+  buf += "  display: grid;";
+  buf += "  grid-template-columns: repeat(4, 1fr);";
+  buf += "  width: 90vw;";
+  buf += "}";
+
+  buf += ".relaysContainer button:first-child {";
+  buf += "  border-top-left-radius: 10px;";
+  buf += "}";
+
+  buf += ".relaysContainer button:nth-child(4) {";
+  buf += "  border-top-right-radius: 10px;";
+  buf += "}";
+
+  buf += ".relaysContainer button:last-child {";
+  buf += "  border-bottom-right-radius: 10px;";
+  buf += "}";
+
+  buf += ".relaysContainer button:nth-child(5n + 1):nth-last-child(-n + 5) {";
+  buf += "  border-bottom-left-radius: 10px;";
+  buf += "}";
+
+  buf += ".selectRelayButton {";
+  buf += "  border: 2px solid #ffffff;";
+  buf += "  padding: 0.5rem;";
+  buf += "  border-radius: 0;";
+  buf += "  background-color: #A64D4D;";
+  buf += "  color: #ffffff;";
+  buf += "}";
+
+  buf += ".selectRelayButton h1 {";
+  buf += "  font-size: 3rem;";
+  buf += "  color: #ffffff;";
+  buf += "}";
+
+  buf += ".selectRelayButton p {";
+  buf += "	font-size: 1.5rem;";
+  buf += "	color: #ffffff;";
+  buf += "	font-weight: 600;";
+  buf += "}";
+
+  buf += ".selectRelayButton label {";
+  buf += "  color: #ffffff;";
+  buf += "  font-size: 1.3rem;";
+  buf += "}";
+
+  buf += "header p {";
+  buf += "  font-size: 1.3rem;";
+  buf += "}";
+
+  buf += "header {";
+  buf += "  display: flex;";
+  buf += "  flex-direction: column;";
+  buf += "  align-items: center;";
+  buf += "  gap: 1rem;";
+  buf += "}";
+
+  buf += ".selectedPort {";
+  buf += "  color: #ffffff;";
+  buf += "  background-color: #8AC87F;";
+  buf += "}";
+
 
   buf += "</style>";
   buf += "<body>";
   buf += "    <div class='wrapper'>";
   buf += "        <div class='app'>";
-  buf += "            <h1>configure o horario para ligar e desligar o aparelho</h1>";
+  buf += "            <h1>configurar rotina</h1>";
+  buf += "            <div class='header'>";
+
+  buf += "      <p>";
+  buf += "        Selecionar porta";
+  buf += "      </p>";
+  buf += "              <div class='relaysContainer'>";
+  for(int i = 0; i<NUMBER_OF_RELAYS; i++){
+    buf += "        <button class='selectRelayButton ";
+    buf+="' ";
+    buf+="id='selectRelayButton-";
+    buf+=numberToTwoChars(relays[i].id);
+    buf+= "' ";
+    buf+="onclick='selectRelay(\""+numberToTwoChars(relays[i].id)+"\")'\n";
+    buf += "          <p>porta</p>";
+    buf += "          <h1>"+String(relays[i].id)+"</h1>";
+    buf += "        </button>";
+  }
+
+  buf += "      </div>";
+  buf += "    </div>  ";
   buf += "            <div class='timers-container'>";
   buf += "                <div class='timer'>";
   buf += "                    <h1>liga:</h1>";
@@ -189,6 +272,18 @@ String Pages::createRoutinePage(){
   //   buf += mensagemdeErro;
   //   buf += "')\n";
   // }
+
+  buf += "let relayId;\n";
+  buf += "function selectRelay(id){\n";
+  buf += "  const manualButton = window.document.getElementById(`selectRelayButton-${id}`)\n";
+  buf += "  const lastManualButton = window.document.getElementById(`selectRelayButton-${relayId}`)\n";
+  buf += "  manualButton.classList.add('selectedPort')\n";
+  buf += " if(lastManualButton){\n";
+  buf += "  lastManualButton.classList.remove('selectedPort')\n";
+  buf += " }\n";
+  buf += "  relayId = id\n";
+  buf += "}\n";
+
   buf += "    let horasLiga = 0\n";
   buf += "    let minutosLiga = 0\n";
   buf += "    function atualizarDisplayLiga() {\n";
@@ -249,7 +344,11 @@ String Pages::createRoutinePage(){
   buf += "        window.location.replace('/')\n";
   buf += "    }\n";
   buf += "    function confirmar() {\n";
-  buf += "        window.location.replace(`/adicionar-rotina?horaliga=${horasLiga}&minutoliga=${minutosLiga}&horaDesliga=${horasDesliga}&minutoDesliga=${minutosDesliga}`)\n";
+  buf += "      if(!relayId){\n";
+  buf += "        alert('Porta não selecionada')\n";
+  buf += "        return\n";
+  buf += "      }\n";
+  buf += "        window.location.replace(`/adicionar-rotina?horaliga=${horasLiga}&minutoliga=${minutosLiga}&horaDesliga=${horasDesliga}&minutoDesliga=${minutosDesliga}&id=${relayId}`)\n";
   buf += "    }\n";
   buf += "</script>";
   buf += "</html>";
