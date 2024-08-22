@@ -1,43 +1,31 @@
-#include <EEPROM.h>
 #include <Wire.h>
 #include <SPI.h>
-#include <WiFi.h>
-#include <RTClib.h>
 #include <array>
 
 #include "utils.h"
 #include "eepromManager.h"
-#include "pages.h"
 #include "RTCController.h"
 #include "routinesController.h"
 #include "relayController.h"
 #include "webSocket.h"
 #include "interruptionHandlers.h"
 #include "httpServer.h"
+#include "WifiManager.h"
 
+Preferences preferences;
 RelayController relays[NUMBER_OF_RELAYS];
 WebSocket webSocket;
 HTTPServer httpServer;
 volatile unsigned long lastClickTime = 0;
-SemaphoreHandle_t buttonSemaphoreChange;
-
-const char* ssid     = "sistema_de_irrigacao";
-const char* password = "123456789";
-void initWiFi(){
-  IPAddress local_ip(192,168,1,1);
-  IPAddress gateway(192,168,1,1);
-  IPAddress subnet(255,255,255,0);
-
-  WiFi.softAP(ssid, password);
-  WiFi.softAPConfig(local_ip, gateway, subnet);
-}
+SemaphoreHandle_t fisicallyToggleRelaySemaphore;
+SemaphoreHandle_t changeWifiModeSemaphore;
 
 void setup() {
   Serial.begin(115200);
-  initWiFi();
 
-  buttonSemaphoreChange = xSemaphoreCreateBinary();
-  if (buttonSemaphoreChange == NULL) {
+  fisicallyToggleRelaySemaphore = xSemaphoreCreateBinary();
+  changeWifiModeSemaphore = xSemaphoreCreateBinary();
+  if(fisicallyToggleRelaySemaphore == NULL || changeWifiModeSemaphore == NULL) {
     Serial.println("Failed to create semaphore");
     while (1);
   }
@@ -47,6 +35,7 @@ void setup() {
   relays[2] = RelayController(26,32, 3);
   relays[3] = RelayController(25,33, 4);
 
+  WifiManager::begin();
   webSocket.begin();
   httpServer.begin();
 
@@ -60,12 +49,12 @@ void setup() {
 		RTCController::rtc.adjust(DateTime(2023, 5, 06, 15, 00, 00)); //(ANO), (MÊS), (DIA), (HORA), (MINUTOS), (SEGUNDOS)
 	}
 
-  Serial.println(WiFi.localIP());
-  Serial.println();
-
 }
 
 int lastMinuteInLoop = -1;
+int lastChangeWifiClick = 0;
+int changeWifiButtonStatus = 0;
+bool resetWifi = false;
 void loop(){
 
   std::array<int,3> now = RTCController::getNow();
@@ -109,7 +98,7 @@ void loop(){
       }
 
       for(int i = 0; i< NUMBER_OF_RELAYS; i++){
-        if(portsStatus[i] && !relays[i].isOn){ relays[i].turnOn(); } 
+        if(portsStatus[i] && !relays[i].isOn){ relays[i].turnOn(); }
         else if(!portsStatus[i] && relays[i].isOn) { relays[i].turnOff(); }
       }
     } else {
@@ -126,15 +115,27 @@ void loop(){
       }
     }
   }
-  
 
-  if (xSemaphoreTake(buttonSemaphoreChange, 0) == pdTRUE) {
+  if (xSemaphoreTake(fisicallyToggleRelaySemaphore, 0) == pdTRUE) {
     for(int i =0; i<NUMBER_OF_RELAYS; i++){
       int status = digitalRead(relays[i].buttonPort);
       if(status == 1){
         relays[i].manuallyToggleRelayState();
       } 
     }
+  }
+  
+  if(changeWifiButtonStatus && !resetWifi && millis() - lastChangeWifiClick > 5000){
+    WifiManager::initWifiResetProcess();
+    resetWifi = true;
+  }
+  if (xSemaphoreTake(changeWifiModeSemaphore, 0) == pdTRUE) {
+    if(resetWifi){
+      WifiManager::resetWifi();
+      resetWifi = false;
+    }
+    changeWifiButtonStatus = digitalRead(WifiManager::changeWifiModeButtonPort);
+    lastChangeWifiClick = millis();
   }
   httpServer.handleClient();
   webSocket.socket.loop();

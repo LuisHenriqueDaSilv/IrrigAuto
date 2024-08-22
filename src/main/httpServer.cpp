@@ -1,10 +1,5 @@
 #include "httpServer.h"
-#include "pages.h"
-#include "routinesController.h"
-#include "RTCController.h"
-#include "relayController.h"
-#include "utils.h"
-#include "eepromManager.h"
+
 
 HTTPServer::HTTPServer() : server(80) {}
 
@@ -12,6 +7,7 @@ void HTTPServer::setRoutes(){
 	server.on("/", [this](){server.send(200, "text/html", Pages::landingPage());});
 	server.on("/configurar-relogio", [this](){server.send(200, "text/html", Pages::clockAdjustPage());});
 	server.on("/configurar-rotina", [this](){server.send(200, "text/html", Pages::createRoutinePage());});
+	server.on("/configurar-rede", [this](){server.send(200, "text/html", Pages::configureNetwork());});
 	server.on("/excluir-rotina", [this](){handleDeleteRoutineRequest(server);});
 	server.on("/apagar-rotinas", [this](){handleDeleteAllRoutinesRequest(server);});
 	server.on("/adicionar-rotina", [this](){handleCreateRoutineRequest(server);});
@@ -87,6 +83,17 @@ void HTTPServer::handleCreateRoutineRequest(WebServer& server){
 		minuteToTurnOff,
 		relayIndex
 	);
+
+  server.sendHeader("Location", "/", true); 
+  server.send(302, "text/plain", "");
+}
+
+void HTTPServer::handleConfigureNetwork(WebServer& server){
+  String ssid = server.arg(0);
+  String password = server.arg(1);
+  String mode = server.arg(2);
+
+  WifiManager::saveWifiInfos(ssid, password, mode);
 
   server.sendHeader("Location", "/", true); 
   server.send(302, "text/plain", "");

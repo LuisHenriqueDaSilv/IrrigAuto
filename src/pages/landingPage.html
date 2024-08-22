@@ -1,314 +1,355 @@
-<html lang='pt-BR'>
+<html lang="pt-BR">
 
 <head>
-  <meta charset='UTF-8'>
-  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IrrigAuto</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      text-align: center;
+      color: #403937;
+    }
+
+    :root {
+      font-size: 62.5%;
+    }
+
+    body {
+      background: linear-gradient(107.56deg, #5D5F28 0%, rgba(32, 90, 38, 0.557143) 32.29%, rgba(26, 87, 32, 0.264286) 53.65%, rgba(30, 30, 30, 0) 100%);
+      background-color: #1E1E1E;
+      overflow-x: hidden;
+    }
+
+    .wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app {
+      min-height: 100vh;
+      max-width: 97.4rem;
+      padding: 2rem 1rem;
+      background-color: #D9D9D9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3rem;
+    }
+
+    .optionButton {
+      padding: 1rem;
+      border: none;
+      cursor: pointer;
+      transition: 200ms;
+      font-size: 1.6rem;
+      border-radius: 10px;
+      box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+      background: #C4C4C4;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      opacity: 0.7;
+    }
+
+    .on {
+      color: #8AC880;
+    }
+
+    .off {
+      color: #D45C5C;
+    }
+
+    .routinesContainer {
+      width: 90%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      border-radius: 10px;
+      background-color: #cecece;
+      box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+      padding: 1rem;
+    }
+
+    .routines {
+      gap: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .routine {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      border: solid .5px #4039372a;
+      border-radius: 10px;
+      padding: .5rem;
+      gap: 4rem;
+    }
+
+    .routine p {
+      font-size: 2rem;
+    }
+
+    .deleteRoutineButton {
+      width: 4rem;
+      height: 4rem;
+      margin-left: auto;
+      font-size: 1.5rem;
+      background: #B55454;
+      border: none;
+      border-radius: 10px;
+    }
+
+    .routinesFooter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      width: 60%;
+    }
+
+    a {
+      font-size: 1.5rem;
+    }
+
+    .clock {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-direction: row;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .clock div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #CDCDCD;
+      height: 5rem;
+      width: 5rem;
+      border-radius: 10px;
+      font-size: 2rem;
+    }
+
+    .clockSeparator {
+      font-size: 2rem;
+      align-self: center;
+    }
+
+    .manualButtonsContainer {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      width: 100%;
+    }
+
+    .manualButtonsContainer button:first-child {
+      border-top-left-radius: 10px;
+    }
+
+    .manualButtonsContainer button:nth-child(4) {
+      border-top-right-radius: 10px;
+    }
+
+    .manualButtonsContainer button:last-child {
+      border-bottom-right-radius: 10px;
+    }
+
+    .manualButtonsContainer button:nth-child(5n + 1):nth-last-child(-n + 5) {
+      border-bottom-left-radius: 10px;
+    }
+
+    .relayManualButton {
+      border: 2px solid #ffffff;
+      padding: 0.5rem;
+      border-radius: 0;
+      color: #ffffff;
+      background-color: #dfdfdf;
+    }
+
+    .relayManualButton h1 {
+      font-size: 3rem;
+      color: #ffffff;
+    }
+
+    .relayManualButton p {
+      font-size: 1.5rem;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .relayManualButton label {
+      color: #ffffff;
+      font-size: 1.3rem;
+    }
+
+    .offButton {
+      background-color: #A64D4D;
+      color: #ffffff;
+    }
+
+    .onButton {
+      color: #ffffff;
+      background-color: #8AC87F;
+    }
+
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .portIdentifier {
+      width: 4rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-itens: center;
+      height: 4rem;
+      margin-right: auto;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+    }
+
+    .portIdentifier span {
+      font-size: 8px;
+    }
+
+    .portIdentifier * {
+      color: #ffffff;
+    }
+
+    header p {
+      font-size: 1.3rem;
+    }
+  </style>
 </head>
-<style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
-    text-align: center;
-    color: #403937;
-  }
-
-  :root {
-    font-size: 62.5%;
-  }
-
-  body {
-    background: linear-gradient(107.56deg, #5D5F28 0%, rgba(32, 90, 38, 0.557143) 32.29%, rgba(26, 87, 32, 0.264286) 53.65%, rgba(30, 30, 30, 0) 100%);
-    background-color: #1E1E1E;
-    overflow-x: hidden;
-  }
-
-  .wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .app {
-    height: 100vh;
-    max-width: 97.4rem;
-    padding: 2rem 1rem;
-    background-color: #D9D9D9;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3rem;
-  }
-
-  header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  header span {
-    font-size: 3.5rem;
-    font-weight: 700;
-    -webkit-text-stroke: .5px #403937a6;
-  }
-
-  header p {
-    font-size: 1.3rem;
-  }
-
-  button {
-    padding: 1rem;
-    border: none;
-    cursor: pointer;
-    transition: 200ms;
-    font-size: 1.6rem;
-    border-radius: 10px;
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
-    background: #C4C4C4;
-  }
-
-  button:hover {
-    transform: scale(1.05);
-    opacity: 0.7;
-  }
-
-  .on {
-    color: #8AC880;
-  }
-
-  .off {
-    color: #D45C5C;
-  }
-
-  .offButton {
-    background-color: #8AC880;
-    color: #ffffff;
-  }
-
-  .onButton {
-    color: #ffffff;
-    background-color: #D45C5C;
-  }
-
-  .routinesContainer {
-    width: 90%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    border-radius: 10px;
-    background-color: #cecece;
-    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
-    padding: 1rem;
-  }
-
-  .routines {
-    gap: 1rem;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .routine {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    border: solid .5px #4039372a;
-    border-radius: 10px;
-    padding: .5rem;
-    gap: 4rem;
-  }
-
-  .routine p {
-    font-size: 2rem;
-  }
-
-  .deleteRoutineButton {
-    width: 4rem;
-    height: 4rem;
-    margin-left: auto;
-    font-size: 1.5rem;
-    background: #B55454;
-  }
-
-  .routinesFooter {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    width: 60%;
-  }
-
-  a {
-    font-size: 1.5rem;
-  }
-
-  .clock {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    flex-direction: row;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .clock div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #CDCDCD;
-    height: 5rem;
-    width: 5rem;
-    border-radius: 10px;
-    font-size: 2rem;
-  }
-
-  .clockSeparator {
-    font-size: 2rem;
-    align-self: center;
-  }
-</style>
 
 <body>
-  <div class='wrapper'>
-    <div class='app'>
-
-      <header>
-        <div>
-          <h1>O dispositivo está </h1>
-          <span class='on' id='status'>ligado</span>
-        </div>
-        <p>E permanecera assim até ser alterado por uma rotina configurada ou ser alterado manualmente.</p>
-        <button href='/desligar-manualmente' id='manualButton' class='onButton'>
-          desligar manualmente
-        </button>
-        <!-- <div>
-          <h1>O dispositivo está </h1>
-          <span class='off'>desligado</span>
-        </div>
-        <p>E permanecera assim até ser alterado por uma rotina configurada ou ser alterado manualmente.</p>
-        <button href='/desligar-manualmente' id='manualButton' class='offButton'>
-          ligar manualmente
-        </button> -->
+  <div class="wrapper">
+    <div class="app">
+      <header class="header">
+        <div class="manualButtonsContainer"> <button class="relayManualButton offButton" id="relayManualButton-01"
+            onclick="manuallyTurnRelay(1)" <p="">porta<p></p>
+            <h1>1</h1> <label>desligado </label>
+          </button> <button class="relayManualButton offButton" id="relayManualButton-02" onclick="manuallyTurnRelay(2)"
+            <p="">porta<p></p>
+            <h1>2</h1> <label>desligado </label>
+          </button> <button class="relayManualButton offButton" id="relayManualButton-03" onclick="manuallyTurnRelay(3)"
+            <p="">porta<p></p>
+            <h1>3</h1> <label>desligado </label>
+          </button> <button class="relayManualButton offButton" id="relayManualButton-04" onclick="manuallyTurnRelay(4)"
+            <p="">porta<p></p>
+            <h1>4</h1> <label>desligado </label>
+          </button> </div>
+        <p> Toque em uma porta para alterar seu estado manualmente. A porta permanecerá nesse estado até que uma rotina
+          ou nova alteração manual ocorra. </p>
       </header>
-
-      <div class='routinesContainer'>
+      <div class="routinesContainer">
         <h1>rotinas configuradas</h1>
-        <div class='routines'>
-          <div class='routine'>
-            <p><strong id='on'>00:00</strong> até <strong id='off'>00:00</strong></p>
-            <button 
-              class='deleteRoutineButton'
-              onclick='deleteRoutine(
-              
-              )'
-            > 🗑 </button>
+        <div class="routines">
+          <div class="routine">
+            <div class="portIdentifier portIdentifierN-03 offButton"> <span>porta</span>
+              <h1>03 </h1>
+            </div>
+            <p><strong>05:05</strong> até <strong>10:10</strong></p> <button class="deleteRoutineButton"
+              onclick="deleteRoutine(&quot;05051010&quot;)"> 🗑 </button>
           </div>
         </div>
-
-        <!-- <h1>ainda não existe nenhuma rotina configurada</h1> -->
-
-        <div class='routinesFooter'>
-          <button style="width:100%" href='/configurar-rotina'>adicionar rotina</button>
-          <button style="width:100%" href='/apagar-rotinas'>apagar rotinas</button>
-        </div>
+        <div class="routinesFooter"> <a style="width:100%; heigth:100%;" href="/configurar-rotina"><button
+              class="optionButton" style="width:100%">adicionar rotina</button></a> <button class="optionButton"
+            style="width:100%" onclick="clearRoutines()">apagar rotinas</button> </div>
       </div>
-
       <div>
         <h1>horario atual:</h1>
-        <div class='clock'>
-          <div id='currentHour'>
-            00
-          </div> <label class='clockSeparator'>:</label>
-          <div id='currentMinute'>
-            00
-          </div>
+        <div class="clock">
+          <div id="currentHour">14 </div> <label class="clockSeparator">:</label>
+          <div id="currentMinute">13 </div>
         </div>
-        <a href='/configurar-relogio'>configurar relogio</a>
-      </div>
+      </div> <a href="/configurar-relogio">configurar relogio</a> <a href="/configurar-rede">configurar rede</a>
     </div>
   </div>
-</body>
-<script>
-
-  async function fetchRoutines(){
-    const routinesResponse = await fetch("/rotinas");
-    const routinesResponseData = routinesResponse.json()
-    const routinesContainer = document.getElementsByClassName("routines")[0]
-    routinesContainer.innerHTML = ''
-    for(const i = 0; i< routinesResponseData.number; i++){
-      const turnOnHour = routines.substring(i*8, i*8+2);
-      const turnOnMinute = routines.substring(i*8+2, i*8+4);
-      const turnOffHour = routines.substring(i*8+4, i*8+6);
-      const turnOffMinute = routines.substring(i*8+6, i*8+8);
-      const newRoutinesContainerHtml = routinesContainer.innerHTML
-      newRoutinesContainerHtml + `
-      <div class='routine'>
-        <p><strong id='on'>${turnOnHour}:${turnOnMinute}</strong> até <strong id='off'>${turnOffHour}:${turnOffMinute}</strong></p>
-        <button 
-          class='deleteRoutineButton'
-          onclick='deleteRoutine(
-          ${turnOnHour}:${turnOnMinute}${turnOffHour}:${turnOffMinute}
-          )'
-        > 🗑 </button>
-      </div>
-      `
-      routinesContainer.innerHTML = newRoutinesContainerHtml
-    }
-  }
-  async function fetchDatas(){
-    const currentDate = await (await fetch('/relogio')).json()
-    window.document.getElementById('currentHour').innerHTML = currentDate.hora
-    window.document.getElementById('currentMinute').innerHTML = currentDate.minuto
-    const relayStatus = await (await fetch('/status')).json()
-    const statusDisplay = window.document.getElementById('status')
-    const manualButton = window.document.getElementById('manualButton')
-    if (relayStatus.status == 0) {
-      statusDisplay.innerHTML = 'desligado'
-      manualButton.innerHTML = 'ligar manualmente'
-      manualButton.className = 'offButton'
-    } else {
-      statusDisplay.innerHTML = 'ligado'
-      statusDisplay.id = 'ligado'
-      statusDisplay.className = 'on'
-      manualButton.innerHTML = 'desligar manualmente'
-      manualButton.className = 'onButton'
-    }
-  }
-  setInterval(fetchDatas, 5000)
-  async function deleteRoutine(routine) {
-    const turnOnHour  = routine.slice(0, 2)
-    const turnOnMinute = routine.slice(2, 4)
-    const turnOffHour  = routine.slice(4, 6)
-    const turnOffMinute = routine.slice(6, 8)
-    const usuarioConfirmouAExclusao = confirm(`deseja mesmo excluir a rotina de ${turnOnHour}:${turnOnMinute} até ${turnOffHour}:${turnOffMinute}?`)
-    if (usuarioConfirmouAExclusao) {
-      const horarioFormatadoParaEnvio = `${turnOnHour}${turnOnMinute}${turnOffHour}${turnOffMinute}`
-      const response = await fetch(`/excluir-rotina?horario=${horarioFormatadoParaEnvio}`);
-      if(response.status == 200){
-        fetchRoutines();
+  <script>var socket = new WebSocket('ws://' + location.hostname + ':81/')
+    function updateRelayStatus({ isOn, id }) {
+      const manualButton = window.document.getElementById(`relayManualButton-${id}`)
+      const manualButtonSpan = manualButton.getElementsByTagName('label')[0]
+      console.log(`portIdentifierN-${id}`)
+      const portIdentifiers = window.document.getElementsByClassName(`portIdentifierN-${id}`)
+      if (parseInt(isOn)) {
+        for (var i = 0; i < portIdentifiers.length; i++) {
+          portIdentifiers[i].classList.remove('offButton')
+          portIdentifiers[i].classList.add('onButton')
+        }
+        manualButton.classList.add('onButton')
+        manualButton.classList.remove('offButton')
+        manualButtonSpan.innerHTML = 'ligado'
+      } else {
+        manualButton.classList.remove('onButton')
+        manualButton.classList.add('offButton')
+        manualButtonSpan.innerHTML = 'desligado'
+        for (var i = 0; i < portIdentifiers.length; i++) {
+          portIdentifiers[i].classList.remove('onButton')
+          portIdentifiers[i].classList.add('offButton')
+        }
       }
     }
-  }
-
-  async function manuallyTurnRelay(){
-    const response = await fetch('/mudar-rele')
-    if(response.status == 200){
-      fetchDatas()
+    function updateClockDisplay(currentDate) {
+      window.document.getElementById('currentHour').innerHTML = currentDate.hora
+      window.document.getElementById('currentMinute').innerHTML = currentDate.minuto
     }
-  }
-
-  async function clearRoutines(){
-    const response = await fetch("/apagar-rotinas")
-    if(response.status == 200){
-      fetchRoutines()
+    socket.onmessage = (event) => {
+      console.log(event)
+      const data = JSON.parse(event.data)
+      switch (data.event) {
+        case 'relayChange':
+          updateRelayStatus(data.buffer)
+          break;
+        case 'clockUpdate':
+          updateClockDisplay(data.buffer)
+          break;
+        default:
+          console.log('Evento desconhecido');
+      }
     }
-  }
-
-</script>
+    async function reloadPage() {
+      location.reload()
+    }
+    async function deleteRoutine(routine) {
+      const turnOnHour = routine.slice(0, 2)
+      const turnOnMinute = routine.slice(2, 4)
+      const turnOffHour = routine.slice(4, 6)
+      const turnOffMinute = routine.slice(6, 8)
+      const usuarioConfirmouAExclusao = confirm(`deseja mesmo excluir a rotina de ${turnOnHour}:${turnOnMinute} até ${turnOffHour}:${turnOffMinute}?`)
+      if (usuarioConfirmouAExclusao) {
+        const horarioFormatadoParaEnvio = `${turnOnHour}${turnOnMinute}${turnOffHour}${turnOffMinute}`
+        const response = await fetch(`/excluir-rotina?horario=${horarioFormatadoParaEnvio}`);
+        reloadPage()
+      }
+    }
+    async function manuallyTurnRelay(id) {
+      fetch(`/mudar-rele?id=${id}`)
+    }
+    async function clearRoutines() {
+      const usuarioConfirmouAExclusao = confirm(`deseja mesmo excluir todas as rotinas configuradas??`)
+      if (usuarioConfirmouAExclusao) {
+        const response = await fetch('/apagar-rotinas')
+        if (response.status == 200) {
+          reloadPage()
+        }
+      }
+    }
+  </script>
+</body>
 
 </html>

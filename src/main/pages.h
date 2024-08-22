@@ -9,5 +9,6 @@
       static String landingPage();
       static String clockAdjustPage();
       static String createRoutinePage();
+      static String configureNetwork();
   };
 #endif

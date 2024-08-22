@@ -358,8 +358,9 @@ String Pages::landingPage(){
   buf += numberToTwoChars(now[1]);
   buf += "          </div>";
   buf += "        </div>";
-  buf += "        <a href='/configurar-relogio'>configurar relogio</a>";
   buf += "      </div>";
+  buf += "      <a href='/configurar-relogio'>configurar relogio</a>";
+  buf += "      <a href='/configurar-rede'>configurar relogio</a>";
   buf += "    </div>";
   buf += "  </div>";
   buf += "</body>";
