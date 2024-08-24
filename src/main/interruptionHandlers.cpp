@@ -1,24 +1,23 @@
 #include "interruptionHandlers.h"
-#include <Arduino.h>
 
-void IRAM_ATTR handleManualButtonChange() {
+void IRAM_ATTR handleToggleRelayInterruption() {
   unsigned long currentTime = millis();
-  if (currentTime - lastClickTime > DEBOUNCE_TIME) {
-    lastClickTime = currentTime;
+  if (currentTime - fisicalButtonsLastClickTime > DEBOUNCE_TIME) {
+    fisicalButtonsLastClickTime = currentTime;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(fisicallyToggleRelaySemaphore, &xHigherPriorityTaskWoken);
+    xSemaphoreGiveFromISR(toggleRelayInterruptionSemaphore, &xHigherPriorityTaskWoken);
     if (xHigherPriorityTaskWoken) {
       portYIELD_FROM_ISR();
     }
   }
 }
 
-void IRAM_ATTR handleChangeWifiModeButton() {
+void IRAM_ATTR handleChangeWifiModeInterruption() {
   unsigned long currentTime = millis();
-  if (currentTime - lastClickTime > DEBOUNCE_TIME) {
-    lastClickTime = currentTime;
+  if (currentTime - fisicalButtonsLastClickTime > DEBOUNCE_TIME) {
+    fisicalButtonsLastClickTime = currentTime;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xSemaphoreGiveFromISR(changeWifiModeSemaphore, &xHigherPriorityTaskWoken);
+    xSemaphoreGiveFromISR(changeWifiModeInterruptionSemaphore, &xHigherPriorityTaskWoken);
     if (xHigherPriorityTaskWoken) {
       portYIELD_FROM_ISR();
     }

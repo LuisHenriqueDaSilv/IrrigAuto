@@ -1,10 +1,6 @@
 #include "eepromManager.h"
 
-#include <EEPROM.h>
-
-#include "utils.h"
-
-void saveRoutineInEEPROM(
+void addRoutineInEEPROM(
   int hourToTurnON,
   int minuteToTurnOn,
   int hourToTurnOff,
@@ -18,38 +14,33 @@ void saveRoutineInEEPROM(
   // Cada bloco da rotina é dado por um valor entre 0 e 60, sendo salvo em um endereço da EEPROM
   // Tornando viavel o seguinte cálculo:
   int firstEmptyAddresInEEPROM = routines.length()/2;
-  if(firstEmptyAddresInEEPROM+4 >= EEPROM_SIZE ){
-    return;
-  }
+  if(firstEmptyAddresInEEPROM+4 >= EEPROM_SIZE ){ return; }
   EEPROM.begin(EEPROM_SIZE);
-  //           addrs                       value
   EEPROM.write(firstEmptyAddresInEEPROM,   hourToTurnON);
   EEPROM.write(firstEmptyAddresInEEPROM+1, minuteToTurnOn);
   EEPROM.write(firstEmptyAddresInEEPROM+2, hourToTurnOff);
   EEPROM.write(firstEmptyAddresInEEPROM+3, minuteToTurnOFF);
   EEPROM.write(firstEmptyAddresInEEPROM+4, relayIndex);
+  EEPROM.commit();
   EEPROM.end();    
 }
 
-void saveRoutinesString(String routines){
+void writeValuesInEEPROM(String routines, int numberOfRoutines){
   int routinesLenght = routines.length();
-  int numberOfRoutines = getNumberOfRoutines(routines);
-  for(int i = 0; i < numberOfRoutines; i = i + 1){ 
-    int hourToTurnOn = atoi(routines.substring(i*ROUTINE_LENGTH, i*ROUTINE_LENGTH+2).c_str());
-    int minuteToTurnOn = atoi(routines.substring(i*ROUTINE_LENGTH+2, i*ROUTINE_LENGTH+4).c_str());
-    int hourToTurnOff = atoi(routines.substring(i*ROUTINE_LENGTH+4, i*ROUTINE_LENGTH+6).c_str());
-    int minuteToTurnOff = atoi(routines.substring(i*ROUTINE_LENGTH+6, i*ROUTINE_LENGTH+8).c_str());
-    int relayIndex = atoi(routines.substring(i*ROUTINE_LENGTH+8, i*ROUTINE_LENGTH+10).c_str());
-    saveRoutineInEEPROM(hourToTurnOn, minuteToTurnOn, hourToTurnOff, minuteToTurnOff, relayIndex);
+  EEPROM.begin(EEPROM_SIZE);
+  int addresCounter = 0;
+  for(int i = 0; i < routinesLenght; i+=2){
+    int value = atoi(routines.substring(i, i+2).c_str());
+    EEPROM.write(addresCounter, value);
+    addresCounter++;
   }
+  EEPROM.commit();
+  EEPROM.end();
 }
 
 void clearEEPROM(){
   EEPROM.begin(512);  
-
-  for (int i = 0; i < EEPROM_SIZE; i++) {
-    EEPROM.write(i, 0);
-  }
+  for (int i = 0; i < EEPROM_SIZE; i++) { EEPROM.write(i, 0); }
   EEPROM.commit();
   EEPROM.end();
 }

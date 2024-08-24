@@ -7,10 +7,11 @@ RelayController::RelayController(int port_, int buttonPort_, int id_){
   port = port_;
   buttonPort = buttonPort_;
   id = id_;
+  isOn = false;
 	pinMode(port_, OUTPUT);
   pinMode(buttonPort_, INPUT_PULLUP);
   digitalWrite(port_, LOW);
-  attachInterrupt(digitalPinToInterrupt(buttonPort), handleManualButtonChange, RISING );
+  attachInterrupt(digitalPinToInterrupt(buttonPort), handleToggleRelayInterruption, RISING );
 }
 
 void RelayController::emitStatus(int id, bool status){

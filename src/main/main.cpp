@@ -16,16 +16,17 @@ Preferences preferences;
 RelayController relays[NUMBER_OF_RELAYS];
 WebSocket webSocket;
 HTTPServer httpServer;
-volatile unsigned long lastClickTime = 0;
-SemaphoreHandle_t fisicallyToggleRelaySemaphore;
-SemaphoreHandle_t changeWifiModeSemaphore;
+SemaphoreHandle_t toggleRelayInterruptionSemaphore;
+SemaphoreHandle_t changeWifiModeInterruptionSemaphore;
+
+volatile unsigned long fisicalButtonsLastClickTime = 0;
 
 void setup() {
   Serial.begin(115200);
 
-  fisicallyToggleRelaySemaphore = xSemaphoreCreateBinary();
-  changeWifiModeSemaphore = xSemaphoreCreateBinary();
-  if(fisicallyToggleRelaySemaphore == NULL || changeWifiModeSemaphore == NULL) {
+  toggleRelayInterruptionSemaphore = xSemaphoreCreateBinary();
+  changeWifiModeInterruptionSemaphore = xSemaphoreCreateBinary();
+  if(toggleRelayInterruptionSemaphore == NULL || changeWifiModeInterruptionSemaphore == NULL) {
     Serial.println("Failed to create semaphore");
     while (1);
   }
@@ -71,28 +72,25 @@ void loop(){
     bool deviceMustBeTurnedOn = false;
 
     String routines = getRoutinesInEEPROM();
-    int numberOfRoutines = getNumberOfRoutines(routines);
+    int numberOfRoutines = RoutinesController::calcNumberOfRoutines(routines);
     bool portsStatus[NUMBER_OF_RELAYS] = {0};
 
     if(numberOfRoutines > 0){
  
       for(int i = 0; i < numberOfRoutines; i = i + 1){
-        int hourToTurnOn = atoi(routines.substring(i*ROUTINE_LENGTH, i*ROUTINE_LENGTH+2).c_str());
-        int minuteToTurnOn = atoi(routines.substring(i*ROUTINE_LENGTH+2, i*ROUTINE_LENGTH+4).c_str());
-        int hourToTurnOff = atoi(routines.substring(i*ROUTINE_LENGTH+4, i*ROUTINE_LENGTH+6).c_str());
-        int minuteToTurnOff = atoi(routines.substring(i*ROUTINE_LENGTH+6, i*ROUTINE_LENGTH+8).c_str());
-        int relayIndex = atoi(routines.substring(i*ROUTINE_LENGTH+8, i*ROUTINE_LENGTH+10).c_str());
+        String routine = routines.substring(i*ROUTINE_LENGTH, i*ROUTINE_LENGTH+10);
+        RoutineStruct routineInfos = RoutinesController::convertStringToRoutine(routine); 
 
-        int minuteOfTheDayToTurnOn = (hourToTurnOn*60) + minuteToTurnOn;
-        int minuteOfTheDayToTurnOff = (hourToTurnOff*60) + minuteToTurnOff;
+        int minuteOfTheDayToTurnOn = (routineInfos.hourToTurnOn*60) + routineInfos.minuteToTurnOn;
+        int minuteOfTheDayToTurnOff = (routineInfos.hourToTurnOff*60) + routineInfos.minuteToTurnOff;
 
-        if(!portsStatus[relayIndex-1]){
-            portsStatus[relayIndex-1] = checkIfItShouldbeTurnedOn(
+        if(!portsStatus[routineInfos.relayIndex-1]){
+            portsStatus[routineInfos.relayIndex-1] = RoutinesController::shouldItbeTurnedOn(
               currentMinuteOfTheDay, 
               minuteOfTheDayToTurnOn, 
               minuteOfTheDayToTurnOff,
-              relays[relayIndex-1].manuallyTurnedOn,
-              relays[relayIndex-1].manuallyTurnedOff
+              relays[routineInfos.relayIndex-1].manuallyTurnedOn,
+              relays[routineInfos.relayIndex-1].manuallyTurnedOff
             );
         }
       }
@@ -103,9 +101,9 @@ void loop(){
       }
     } else {
       for(RelayController relay: relays){
-        bool relayMustBeTurnedOn = checkIfItShouldbeTurnedOn(
+        bool relayMustBeTurnedOn = RoutinesController::shouldItbeTurnedOn(
           currentMinuteOfTheDay, 
-          currentMinuteOfTheDay+2, 
+          currentMinuteOfTheDay+2,
           currentMinuteOfTheDay+4,
           relay.manuallyTurnedOn,
           relay.manuallyTurnedOff
@@ -116,20 +114,19 @@ void loop(){
     }
   }
 
-  if (xSemaphoreTake(fisicallyToggleRelaySemaphore, 0) == pdTRUE) {
+  if (xSemaphoreTake(toggleRelayInterruptionSemaphore, 0) == pdTRUE) {
     for(int i =0; i<NUMBER_OF_RELAYS; i++){
       int status = digitalRead(relays[i].buttonPort);
-      if(status == 1){
-        relays[i].manuallyToggleRelayState();
-      } 
+      if(status == 1){ relays[i].manuallyToggleRelayState(); } 
     }
   }
   
   if(changeWifiButtonStatus && !resetWifi && millis() - lastChangeWifiClick > 5000){
+    
     WifiManager::initWifiResetProcess();
     resetWifi = true;
   }
-  if (xSemaphoreTake(changeWifiModeSemaphore, 0) == pdTRUE) {
+  if (xSemaphoreTake(changeWifiModeInterruptionSemaphore, 0) == pdTRUE) {
     if(resetWifi){
       WifiManager::resetWifi();
       resetWifi = false;

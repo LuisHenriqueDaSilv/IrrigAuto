@@ -1,13 +1,14 @@
 #include <Wire.h> 
+#include <Arduino.h>
 
 #ifndef INTERRUPTION_HANDLERS_H
 #define INTERRUPTION_HANDLERS_H
+  const int DEBOUNCE_TIME = 10;
 
-  const int DEBOUNCE_TIME = 300;
+  extern volatile unsigned long fisicalButtonsLastClickTime;
+  extern SemaphoreHandle_t toggleRelayInterruptionSemaphore;
+  extern SemaphoreHandle_t changeWifiModeInterruptionSemaphore;
 
-  extern SemaphoreHandle_t fisicallyToggleRelaySemaphore;
-  extern SemaphoreHandle_t changeWifiModeSemaphore;
-  void IRAM_ATTR handleManualButtonChange();
-  void IRAM_ATTR handleChangeWifiModeButton();
-  extern volatile unsigned long lastClickTime;
+  void IRAM_ATTR handleToggleRelayInterruption();
+  void IRAM_ATTR handleChangeWifiModeInterruption();
 #endif

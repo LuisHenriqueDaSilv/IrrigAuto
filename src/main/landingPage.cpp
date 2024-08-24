@@ -8,7 +8,7 @@
 
 String Pages::landingPage(){
   String routines = getRoutinesInEEPROM();
-  int numberOfRoutines = getNumberOfRoutines(routines);
+  int numberOfRoutines = RoutinesController::calcNumberOfRoutines(routines);
   std::array<int, 3> now = RTCController::getNow();
   String buf = ""; 
 

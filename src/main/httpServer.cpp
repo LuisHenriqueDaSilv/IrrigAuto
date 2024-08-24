@@ -58,7 +58,7 @@ void HTTPServer::handleDeleteAllRoutinesRequest(WebServer& server){
 
 void HTTPServer::handleReadAllRoutinesRequest(WebServer& server){
   String routines = getRoutinesInEEPROM();
-  int numberOfRoutines = getNumberOfRoutines(routines);
+  int numberOfRoutines = RoutinesController::calcNumberOfRoutines(routines);
   String buf = "{ \"routines\": \"" + routines + "\", \"number\": \""+ numberOfRoutines +"\"}";
   server.send(200, "text/json", buf);
 }

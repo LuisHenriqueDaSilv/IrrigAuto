@@ -13,12 +13,12 @@
 			static int changeWifiModeButtonPort;
 			static String defaultPassword;
 			static String defaultSSID;
+			static String defaultAlias;
 
 			static void begin();
 			static void saveWifiInfos(String ssid, String password, String mode);
 			static std::array<String, 3> getWifiInfos();
 			static void initWifiResetProcess();
 			static void resetWifi();
-
 	};
 #endif 
