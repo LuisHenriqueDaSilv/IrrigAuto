@@ -15,16 +15,19 @@ void WifiManager::begin(){
   attachInterrupt(digitalPinToInterrupt(changeWifiModeButtonPort), handleChangeWifiModeInterruption, CHANGE);
 
   std::array<String, 3> infos =  getWifiInfos();
+  
 
   if(infos[2] == "STA"){
     WiFi.begin(infos[0], infos[1]);
     digitalWrite(STAIndicatorLedPort, HIGH);
+    digitalWrite(APIndicatorLedPort, LOW);
     while (WiFi.status() != WL_CONNECTED) {
       delay(1000);
       Serial.println("Conectando");
     }
   } else {
     digitalWrite(APIndicatorLedPort, HIGH);
+    digitalWrite(STAIndicatorLedPort, LOW);
     WiFi.softAP(infos[0], infos[1]);
   }
 

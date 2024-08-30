@@ -1,5 +1,6 @@
 #include <WebServer.h>
 #include <WiFi.h>
+#include <list>
 #include "pages.h"
 #include "routinesController.h"
 #include "RTCController.h"
@@ -25,6 +26,5 @@ class HTTPServer {
     void setRoutes();
     void begin();
     void handleClient();
-
 };
 #endif

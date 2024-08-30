@@ -1,3 +1,5 @@
+#include <EEPROM.h>
+#include <list>
 #include "relayController.h"
 #include "Wire.h"
 #include "relayController.h"
@@ -7,26 +9,30 @@
 #ifndef ROUTINES_CONTROLLER_H
 #define ROUTINES_CONTROLLER_H
   struct RoutineStruct {
-      int hourToTurnOn;
-      int minuteToTurnOn;
-      int hourToTurnOff;
-      int minuteToTurnOff;
-      int relayIndex;
+    int hourToTurnOn;
+    int minuteToTurnOn;
+    int hourToTurnOff;
+    int minuteToTurnOff;
+    int relayIndex;
+    bool operator==(const RoutineStruct& other) const {
+      return (
+        hourToTurnOn == other.hourToTurnOn && 
+        minuteToTurnOn == other.minuteToTurnOn && 
+        hourToTurnOff == other.hourToTurnOff && 
+        minuteToTurnOff == other.minuteToTurnOff && 
+        relayIndex == other.relayIndex
+      );
+    }
   };
   extern RelayController relays[4];
   class RoutinesController {
     public: 
-      static void create(
-        int hourToTurnOn,
-        int minuteToTurnOn,
-        int hourToTurnOff,
-        int minuteToTurnOff,
-        int relayIndex
+      static bool createRoutine(
+        RoutineStruct routine,
+        int routineIndex
       );
-      static void delete_(String routineToDelete);
+      static bool delete_(RoutineStruct routineToDelete);
       static void deleteAll();
-      static void readAll();
-      static int calcNumberOfRoutines(String routines);
       static bool shouldItbeTurnedOn(
         int currentMinuteOfTheDay,
         int minuteOfTheDayToTurnOn,
@@ -34,6 +40,8 @@
         bool manuallyTurnedOn,
         bool manuallyTurnedOff
       );
-      static RoutineStruct convertStringToRoutine(String routine);
+      static std::list<RoutineStruct> getRoutines();
+      static void saveRoutines(std::list<RoutineStruct> routines);
+      static bool routineExist(RoutineStruct routine);
   };
 #endif

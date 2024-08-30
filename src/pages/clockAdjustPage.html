@@ -194,8 +194,9 @@
   function cancelar() {
     window.location.replace('/')
   }
-  function confirmar() {
-    window.location.replace(`/setar-relogio?hora=${horas}&minuto=${minutos}`)
+  async function confirmar() {
+    const response = await fetch(`/setar-relogio?hora=${horas}&minuto=${minutos}`);
+    // window.location.replace(`/setar-relogio?hora=${horas}&minuto=${minutos}`)
   }
 </script>
 

@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include <array>
 
+
 #include "utils.h"
 #include "eepromManager.h"
 #include "RTCController.h"
@@ -31,10 +32,10 @@ void setup() {
     while (1);
   }
 
-  relays[0] = RelayController(14,34, 1);
-  relays[1] = RelayController(27,35, 2);
-  relays[2] = RelayController(26,32, 3);
-  relays[3] = RelayController(25,33, 4);
+  relays[0] = RelayController(14,34,1);
+  relays[1] = RelayController(27,35,2);
+  relays[2] = RelayController(26,32,3);
+  relays[3] = RelayController(25,33,4);
 
   WifiManager::begin();
   webSocket.begin();
@@ -49,7 +50,6 @@ void setup() {
 		Serial.println("DS3231 OK!");
 		RTCController::rtc.adjust(DateTime(2023, 5, 06, 15, 00, 00)); //(ANO), (MÊS), (DIA), (HORA), (MINUTOS), (SEGUNDOS)
 	}
-
 }
 
 int lastMinuteInLoop = -1;
@@ -57,6 +57,7 @@ int lastChangeWifiClick = 0;
 int changeWifiButtonStatus = 0;
 bool resetWifi = false;
 void loop(){
+
 
   std::array<int,3> now = RTCController::getNow();
   if(lastMinuteInLoop != now[1]){
@@ -71,26 +72,21 @@ void loop(){
     int currentMinuteOfTheDay = (now[0]*60) + now[1];
     bool deviceMustBeTurnedOn = false;
 
-    String routines = getRoutinesInEEPROM();
-    int numberOfRoutines = RoutinesController::calcNumberOfRoutines(routines);
+    std::list<RoutineStruct> routines = RoutinesController::getRoutines();
     bool portsStatus[NUMBER_OF_RELAYS] = {0};
 
-    if(numberOfRoutines > 0){
- 
-      for(int i = 0; i < numberOfRoutines; i = i + 1){
-        String routine = routines.substring(i*ROUTINE_LENGTH, i*ROUTINE_LENGTH+10);
-        RoutineStruct routineInfos = RoutinesController::convertStringToRoutine(routine); 
+    if(routines.size() > 0){
+      for(RoutineStruct routine: routines){
+        int minuteOfTheDayToTurnOn = (routine.hourToTurnOn*60) + routine.minuteToTurnOn;
+        int minuteOfTheDayToTurnOff = (routine.hourToTurnOff*60) + routine.minuteToTurnOff;
 
-        int minuteOfTheDayToTurnOn = (routineInfos.hourToTurnOn*60) + routineInfos.minuteToTurnOn;
-        int minuteOfTheDayToTurnOff = (routineInfos.hourToTurnOff*60) + routineInfos.minuteToTurnOff;
-
-        if(!portsStatus[routineInfos.relayIndex-1]){
-            portsStatus[routineInfos.relayIndex-1] = RoutinesController::shouldItbeTurnedOn(
+        if(!portsStatus[routine.relayIndex-1]){
+            portsStatus[routine.relayIndex-1] = RoutinesController::shouldItbeTurnedOn(
               currentMinuteOfTheDay, 
               minuteOfTheDayToTurnOn, 
               minuteOfTheDayToTurnOff,
-              relays[routineInfos.relayIndex-1].manuallyTurnedOn,
-              relays[routineInfos.relayIndex-1].manuallyTurnedOff
+              relays[routine.relayIndex-1].manuallyTurnedOn,
+              relays[routine.relayIndex-1].manuallyTurnedOff
             );
         }
       }

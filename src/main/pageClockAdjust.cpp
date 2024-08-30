@@ -144,12 +144,6 @@ String Pages::clockAdjustPage(){
   buf += "    </div>";
   buf += "</body>";
   buf += "<script>";
-  // if(error){
-  //   error = false;
-  //   buf += "alert('";
-  //   buf += mensagemdeErro;
-  //   buf += "')\n";
-  // }
   buf += "  let horas = 0\n";
   buf += "  let minutos = 0\n";
   buf += "  function atualizarDisplay() {\n";
@@ -181,8 +175,14 @@ String Pages::clockAdjustPage(){
   buf += "  function cancelar(){\n";
   buf += "      window.location.replace('/')\n";
   buf += "  }\n";
-  buf += "  function confirmar(){\n";
-  buf += "      window.location.replace(`/setar-relogio?hora=${horas}&minuto=${minutos}`)\n";
+  buf += "  async function confirmar(){\n";
+  buf += "    const response = await fetch(`/setar-relogio?hora=${horas}&minuto=${minutos}`);\n";
+  buf += "    if(response.status !== 200){\n";
+  buf += "      const data = await response.json()\n";
+  buf += "      alert(data.message);\n";
+  buf += "      return;\n";
+  buf += "    }\n";
+  buf += "    window.location.replace('/')\n";
   buf += "  }\n";
   buf += "</script>";
   buf += "</html>";

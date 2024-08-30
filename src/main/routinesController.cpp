@@ -1,19 +1,33 @@
 #include "routinesController.h"
 
-void RoutinesController::create(
-  int hourToTurnOn, 
-  int minuteToTurnOn, 
-  int hourToTurnOff, 
-  int minuteToTurnOff, 
-  int relayIndex
+bool RoutinesController::createRoutine(
+  RoutineStruct routine,
+  int routineIndex
 ){
-  addRoutineInEEPROM(
-    hourToTurnOn,
-    minuteToTurnOn,
-    hourToTurnOff,
-    minuteToTurnOff,
-    relayIndex
-  );
+  int firstEmptyAddressInEEPROM = routineIndex*(ROUTINE_LENGTH/2);
+  if(firstEmptyAddressInEEPROM+(ROUTINE_LENGTH/2) >= EEPROM_SIZE) { 
+    return false; // Limit reached
+  } 
+  EEPROM.begin(EEPROM_SIZE);
+  EEPROM.write(firstEmptyAddressInEEPROM, routine.hourToTurnOn);
+  EEPROM.write(firstEmptyAddressInEEPROM+1, routine.minuteToTurnOn);
+  EEPROM.write(firstEmptyAddressInEEPROM+2, routine.hourToTurnOff);
+  EEPROM.write(firstEmptyAddressInEEPROM+3, routine.minuteToTurnOff);
+  EEPROM.write(firstEmptyAddressInEEPROM+4, routine.relayIndex);
+  EEPROM.commit();
+  EEPROM.end();
+  return true; // Sucess
+}
+
+void RoutinesController::saveRoutines(std::list<RoutineStruct> routines){
+  Serial.print("Salvando");
+  Serial.print(routines.size());
+  int i = 0;
+  for(RoutineStruct routine: routines){
+    bool creationSucess = createRoutine(routine, i);
+    if(!creationSucess){break;}
+    i++;
+  }
 }
 
 void RoutinesController::deleteAll(){
@@ -23,13 +37,18 @@ void RoutinesController::deleteAll(){
   }
 }
 
-void RoutinesController::delete_(String routineToDelete){
-  String routines = getRoutinesInEEPROM();
-  int indexOfRoutineToDelete = routines.indexOf(routineToDelete);
-  routines.remove(indexOfRoutineToDelete, ROUTINE_LENGTH);
-  clearEEPROM();
-  int numberOfRoutines = calcNumberOfRoutines(routines); 
-  writeValuesInEEPROM(routines, numberOfRoutines);
+bool RoutinesController::delete_(RoutineStruct routineToDelete){
+  std::list<RoutineStruct> routines = getRoutines();
+  for(RoutineStruct routine: routines){
+    if( routine == routineToDelete ){
+      Serial.println("Encontrei");
+      routines.remove(routineToDelete);
+      deleteAll();
+      saveRoutines(routines);
+      return true; // Sucess
+    }  
+  };
+  return false; // Routine not found
 }
 
 bool RoutinesController::shouldItbeTurnedOn(
@@ -60,15 +79,46 @@ bool RoutinesController::shouldItbeTurnedOn(
 
 }
 
-int RoutinesController::calcNumberOfRoutines(String routines){
-  return(routines.length() / ROUTINE_LENGTH);
+
+std::list<RoutineStruct> RoutinesController::getRoutines(){
+  std::list<RoutineStruct> listOfRoutines;
+  bool endOfEEPROM = false;
+  int EEPROMAddressCounter = 0;
+
+  EEPROM.begin(EEPROM_SIZE);
+  while ( !endOfEEPROM && EEPROMAddressCounter < EEPROM_SIZE ){
+    int hourToTurnON    = EEPROM.read(EEPROMAddressCounter );
+    int minuteToTurnOn  = EEPROM.read(EEPROMAddressCounter+1);
+    int hourToTurnOff   = EEPROM.read(EEPROMAddressCounter+2);
+    int minuteToTurnOFF = EEPROM.read(EEPROMAddressCounter+3);
+    int relayIndex      = EEPROM.read(EEPROMAddressCounter+4);
+
+    if( hourToTurnON == 0 && minuteToTurnOn == 0 && hourToTurnOff == 0 && minuteToTurnOFF == 0 ) {
+      endOfEEPROM = true;
+      continue;
+    }
+    RoutineStruct newRoutine = {
+      hourToTurnON,
+      minuteToTurnOn,
+      hourToTurnOff,
+      minuteToTurnOFF,
+      relayIndex
+    };
+    listOfRoutines.push_back(newRoutine);
+    EEPROMAddressCounter += ROUTINE_LENGTH/2;
+  }
+  EEPROM.end();
+
+  return listOfRoutines;
 }
 
-RoutineStruct RoutinesController::convertStringToRoutine(String routine){
-  int hourToTurnOn = atoi(routine.substring(ROUTINE_LENGTH, ROUTINE_LENGTH+2).c_str());
-  int minuteToTurnOn = atoi(routine.substring(ROUTINE_LENGTH+2, ROUTINE_LENGTH+4).c_str());
-  int hourToTurnOff = atoi(routine.substring(ROUTINE_LENGTH+4, ROUTINE_LENGTH+6).c_str());
-  int minuteToTurnOff = atoi(routine.substring(ROUTINE_LENGTH+6, ROUTINE_LENGTH+8).c_str());
-  int relayIndex = atoi(routine.substring(ROUTINE_LENGTH+8, ROUTINE_LENGTH+10).c_str());
-  return { hourToTurnOn, minuteToTurnOn, hourToTurnOff, minuteToTurnOff, relayIndex };
+bool RoutinesController::routineExist(RoutineStruct routineToSearch){
+  std::list<RoutineStruct> routines = getRoutines();
+  for(RoutineStruct routine: routines ){
+    if(routineToSearch == routine){
+      return true;
+    }
+  }
+  return false;
 }
+

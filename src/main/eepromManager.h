@@ -19,6 +19,6 @@
   void writeValuesInEEPROM(String routines, int numberOfRoutines);
   void clearEEPROM();
 
-  String getRoutinesInEEPROM();
+  String readRoutinesInEEPROM();
 
 #endif

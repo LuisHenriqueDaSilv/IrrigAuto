@@ -3,12 +3,12 @@
 #include "eepromManager.h"
 #include "utils.h"
 #include "RTCController.h"
+#include "routinesController.h"
 
 #include "pages.h"
 
 String Pages::landingPage(){
-  String routines = getRoutinesInEEPROM();
-  int numberOfRoutines = RoutinesController::calcNumberOfRoutines(routines);
+  std::list<RoutineStruct> routines = RoutinesController::getRoutines();
   std::array<int, 3> now = RTCController::getNow();
   String buf = ""; 
 
@@ -164,8 +164,7 @@ String Pages::landingPage(){
 
   buf += ".manualButtonsContainer {";
   buf += "  display: grid;";
-  buf += "  grid-template-columns: repeat(5, 1fr);";
-  buf += "  width: 90vw;";
+  buf += "  grid-template-columns: repeat(4, 1fr);";
   buf += "}";
 
   buf += ".manualButtonsContainer button:first-child {";
@@ -180,7 +179,7 @@ String Pages::landingPage(){
   buf += "  border-bottom-right-radius: 10px;";
   buf += "}";
 
-  buf += ".manualButtonsContainer button:nth-child(5n + 1):nth-last-child(-n + 5) {";
+  buf += ".manualButtonsContainer button:nth-child(4n + 1):nth-last-child(-n + 4) {";
   buf += "  border-bottom-left-radius: 10px;";
   buf += "}";
 
@@ -290,22 +289,19 @@ String Pages::landingPage(){
   buf += "    </header>  ";
 
   buf += "      <div class='routinesContainer'>";
-  if(numberOfRoutines > 0){
+  if(routines.size()){
     buf += "        <h1>rotinas configuradas</h1>";
     buf += "        <div class='routines'>";
     
-    for(int i = 0; i < numberOfRoutines; i++){ 
-      String turnOnHour = routines.substring(i*ROUTINE_LENGTH, i*ROUTINE_LENGTH+2);
-      String turnOnMinute = routines.substring(i*ROUTINE_LENGTH+2, i*ROUTINE_LENGTH+4);
-      String turnOffHour = routines.substring(i*ROUTINE_LENGTH+4, i*ROUTINE_LENGTH+6);
-      String turnOffMinute = routines.substring(i*ROUTINE_LENGTH+6, i*ROUTINE_LENGTH+8);
-      String relayIndex = routines.substring(i*ROUTINE_LENGTH+8, i*ROUTINE_LENGTH+10);
-      bool relayIsOn = relays[atoi(relayIndex.c_str())-1].isOn;
+    for(RoutineStruct routine: routines){
+      bool relayIsOn = relays[routine.relayIndex-1].isOn;
 
       buf += "          <div class='routine'>";
 
       buf += "<div class='portIdentifier ";
-      buf += "portIdentifierN-" + relayIndex + " ";
+      buf += "portIdentifierN-"; 
+      buf += routine.relayIndex; 
+      buf += " ";
       if(relayIsOn){
         buf+="onButton";
       } else {
@@ -314,26 +310,27 @@ String Pages::landingPage(){
       buf += "'>";
       buf += "  <span>porta</span>";
       buf += "  <h1>";
-      buf +=      relayIndex;
+      buf +=      numberToTwoChars(routine.relayIndex);
       buf += "  </h1>";
       buf += "</div>";
       
       buf += "            <p><strong>";
-      buf += turnOnHour;
+      buf += numberToTwoChars(routine.hourToTurnOn);
       buf += ":";
-      buf += turnOnMinute;
+      buf += numberToTwoChars(routine.minuteToTurnOn);
       buf += "</strong> até <strong>";
-      buf += turnOffHour;
+      buf += numberToTwoChars(routine.hourToTurnOff);
       buf += ":";
-      buf += turnOffMinute;
+      buf += numberToTwoChars(routine.minuteToTurnOff);
       buf += "</strong></p>";
       buf += "            <button ";
       buf += "              class='deleteRoutineButton'";
       buf += "              onclick='deleteRoutine(\"";
-      buf += turnOnHour;
-      buf += turnOnMinute;
-      buf += turnOffHour;
-      buf += turnOffMinute;
+      buf += numberToTwoChars(routine.hourToTurnOn);
+      buf += numberToTwoChars(routine.minuteToTurnOn);
+      buf += numberToTwoChars(routine.hourToTurnOff);
+      buf += numberToTwoChars(routine.minuteToTurnOff);
+      buf += numberToTwoChars(routine.relayIndex);
       buf += "\")'";
       buf += "            > 🗑 </button>";
       buf += "        </div>";
@@ -360,7 +357,7 @@ String Pages::landingPage(){
   buf += "        </div>";
   buf += "      </div>";
   buf += "      <a href='/configurar-relogio'>configurar relogio</a>";
-  buf += "      <a href='/configurar-rede'>configurar relogio</a>";
+  buf += "      <a href='/rede'>configurar rede</a>";
   buf += "    </div>";
   buf += "  </div>";
   buf += "</body>";
@@ -421,25 +418,39 @@ String Pages::landingPage(){
   buf += "  const turnOnMinute = routine.slice(2, 4)\n";
   buf += "  const turnOffHour  = routine.slice(4, 6)\n";
   buf += "  const turnOffMinute = routine.slice(6, 8)\n";
+  buf += "  console.log(routine)\n";
   buf += "  const usuarioConfirmouAExclusao = confirm(`deseja mesmo excluir a rotina de ${turnOnHour}:${turnOnMinute} até ${turnOffHour}:${turnOffMinute}?`)\n";
   buf += "  if (usuarioConfirmouAExclusao) {\n";
-  buf += "    const horarioFormatadoParaEnvio = `${turnOnHour}${turnOnMinute}${turnOffHour}${turnOffMinute}`\n";
+  buf += "    const horarioFormatadoParaEnvio = `${routine}`\n";
   buf += "    const response = await fetch(`/excluir-rotina?horario=${horarioFormatadoParaEnvio}`);\n";
+  buf += "    if(response.status!= 200){\n";
+  buf += "      const data = await response.json()\n";
+  buf += "      alert(data.message);\n";
+  buf += "      return\n";
+  buf += "    }\n";
   buf += "    reloadPage()\n";
   buf += "  }\n";
   buf += "}\n";
 
   buf += "async function manuallyTurnRelay(id){\n";
-  buf += "  fetch(`/mudar-rele?id=${id}`)\n";
+  buf += "  const response = fetch(`/mudar-rele?id=${id}`)\n";
+  buf += "  if(response.status !== 200){\n";
+  buf += "    const data = await response.json()\n";
+  buf += "    alert(data.message)\n";
+  buf += "    return\n";
+  buf += "  }\n";
   buf += "}\n";
 
   buf += "async function clearRoutines(){\n";
   buf += "  const usuarioConfirmouAExclusao = confirm(`deseja mesmo excluir todas as rotinas configuradas??`)\n";
   buf += "  if (usuarioConfirmouAExclusao) {\n";
   buf += "    const response = await fetch('/apagar-rotinas')\n";
-  buf += "    if(response.status == 200){\n";
-  buf += "      reloadPage()\n";
+  buf += "    if(response.status != 200){\n";
+  buf += "      const data = await response.json()\n";
+  buf += "      alert('Algo de inesperado ocorreu')\n";
+  buf += "      return\n";
   buf += "    }\n";
+  buf += "    reloadPage()\n";
   buf += "  }\n";
   buf += "}\n";
 

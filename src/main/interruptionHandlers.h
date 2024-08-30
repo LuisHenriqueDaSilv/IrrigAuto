@@ -3,7 +3,7 @@
 
 #ifndef INTERRUPTION_HANDLERS_H
 #define INTERRUPTION_HANDLERS_H
-  const int DEBOUNCE_TIME = 10;
+  const int DEBOUNCE_TIME = 300;
 
   extern volatile unsigned long fisicalButtonsLastClickTime;
   extern SemaphoreHandle_t toggleRelayInterruptionSemaphore;
