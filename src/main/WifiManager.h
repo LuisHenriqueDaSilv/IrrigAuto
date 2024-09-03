@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <list>
 #include <Preferences.h>
 #include <esp_system.h>
 #include "interruptionHandlers.h"
@@ -20,5 +21,6 @@
 			static std::array<String, 3> getWifiInfos();
 			static void initWifiResetProcess();
 			static void resetWifi();
+			static std::list<String> scanWifi();
 	};
 #endif 

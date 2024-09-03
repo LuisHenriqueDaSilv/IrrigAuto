@@ -183,7 +183,7 @@ void HTTPServer::handleCreateRoutineRequest(WebServer& server){
   bool routineExists = RoutinesController::routineExist(newRoutine);
   if(routineExists){
     String buf = "{\"status\": \"error\", \"message\": \"Rotina já existente\"}";
-    server.send(200, "text/json", buf);
+    server.send(400, "text/json", buf);
     return;
   }
 
@@ -198,13 +198,51 @@ void HTTPServer::handleCreateRoutineRequest(WebServer& server){
 }
 
 void HTTPServer::handleConfigureNetwork(WebServer& server){
-  String ssid = server.arg(0);
-  String password = server.arg(1);
-  String mode = server.arg(2);
+  // Caso a configuração esteja sendo feita em modo de terceiro, verifica se a rede já existe 
+  String sentSsid = server.arg(0);
+  String sentPassword = server.arg(1);
+  String sentMode = server.arg(2);
 
-  server.sendHeader("Location", "/", true); 
-  server.send(302, "text/plain", "");
-  WifiManager::saveWifiInfos(ssid, password, mode);
+  if(sentSsid.isEmpty() || sentPassword.isEmpty() || sentMode.isEmpty()){
+    server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Informações não suficientes\"}");
+    return;
+  }
+
+  if(sentSsid.length() > 32){
+    server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"SSID inválido\"}");
+    return;
+  }
+
+  if(sentPassword.length() < 8 || sentPassword.length() > 63){
+    server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Senha inválida\"}");
+    return;
+  }
+
+  if(!sentMode.equals("AP") && !sentMode.equals("STA")){
+    server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Modo inválido\"}");
+    return;
+  }
+
+  bool networkAlreadyExists = false;
+  std::list<String> wifiLists = WifiManager::scanWifi();
+  for(String SSID: wifiLists){
+    if(SSID.equals(sentSsid)){
+      networkAlreadyExists = true;
+    }
+    break;
+  }
+
+  if(networkAlreadyExists && sentMode.equals("AP")){
+    server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Impossivel criar a rede informada, aparentemente ela já existe\"}");
+    return;
+  }
+
+  if(sentMode.equals("STA") && !networkAlreadyExists){
+    server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Rede não encontrada\"}");
+    return;
+  }
+  server.sendHeader("Location", "/", true);
+  server.send(200, "text/json", "");
+  WifiManager::saveWifiInfos(sentSsid, sentPassword, sentMode);
 
 }
-

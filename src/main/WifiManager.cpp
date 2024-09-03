@@ -17,7 +17,7 @@ void WifiManager::begin(){
   std::array<String, 3> infos =  getWifiInfos();
   
 
-  if(infos[2] == "STA"){
+  if(infos[2].equals("STA")){
     WiFi.begin(infos[0], infos[1]);
     digitalWrite(STAIndicatorLedPort, HIGH);
     digitalWrite(APIndicatorLedPort, LOW);
@@ -69,4 +69,13 @@ void WifiManager::resetWifi(){
   digitalWrite(APIndicatorLedPort, LOW);
   digitalWrite(STAIndicatorLedPort, LOW);
   saveWifiInfos("Automada", "123456789", "AP");
+}
+
+std::list<String> WifiManager::scanWifi(){
+  int numberOfWifis = WiFi.scanNetworks();
+  std::list<String> SSIDs;
+  for(int i = 0; i < numberOfWifis; i++){
+    SSIDs.push_back(WiFi.SSID(i));
+  }
+  return SSIDs;
 }

@@ -57,8 +57,7 @@ int lastChangeWifiClick = 0;
 int changeWifiButtonStatus = 0;
 bool resetWifi = false;
 void loop(){
-
-
+  
   std::array<int,3> now = RTCController::getNow();
   if(lastMinuteInLoop != now[1]){
 
