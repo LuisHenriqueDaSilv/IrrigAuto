@@ -58,17 +58,15 @@ int changeWifiButtonStatus = 0;
 bool resetWifi = false;
 void loop(){
   
-  std::array<int,3> now = RTCController::getNow();
-  if(lastMinuteInLoop != now[1]){
-
-    std::array<int, 3> now = RTCController::getNow();
-    String hours = numberToTwoChars(now[0]);
-    String minutes = numberToTwoChars(now[1]);
+  NowStruct now = RTCController::getNow();
+  if(lastMinuteInLoop != now.minute){
+    String hours = numberToTwoChars(now.hour);
+    String minutes = numberToTwoChars(now.minute);
     String buf = "{ \"hora\" : \""+ hours + "\", \"minuto\" : \""+ minutes +"\" }";
     webSocket.emitEvent("{\"event\": \"clockUpdate\", \"buffer\":"+buf+"}");
 
-    lastMinuteInLoop = now[1];
-    int currentMinuteOfTheDay = (now[0]*60) + now[1];
+    lastMinuteInLoop = now.minute;
+    int currentMinuteOfTheDay = (now.hour*60) + now.minute;
     bool deviceMustBeTurnedOn = false;
 
     std::list<RoutineStruct> routines = RoutinesController::getRoutines();

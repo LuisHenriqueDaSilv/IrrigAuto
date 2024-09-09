@@ -31,10 +31,11 @@ void HTTPServer::handleConfigureClockRequest(WebServer& server){
   String buf = "";
   String sentHours = server.arg(0);
   String sentMinutes = server.arg(1);
+  String sentDay = server.arg(2);
   
   bool lengthOfSentValuesIsInvalid = ( 
-    (sentHours.isEmpty() || sentMinutes.isEmpty()) && 
-    (sentHours.length() > 2 || sentMinutes.length() > 2)
+    (sentHours.isEmpty() || sentMinutes.isEmpty() || sentDay.isEmpty()) && 
+    (sentHours.length() > 2 || sentMinutes.length() > 2 || sentDay.length() > 1)
   ); 
   if(lengthOfSentValuesIsInvalid){
     server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Horario inválido\"}");
@@ -43,20 +44,27 @@ void HTTPServer::handleConfigureClockRequest(WebServer& server){
 
 	int hours = atoi(sentHours.c_str());
 	int minutes = atoi(sentMinutes.c_str());
+	int day = atoi(sentDay.c_str());
   bool sentValuesNotIsANumber = (
-    (hours == 0 && !sentHours.equals("0") && !sentHours.equals("00")) || (minutes == 0 && !sentMinutes.equals("0") && !sentMinutes.equals("00"))
+    (
+      hours == 0 && !sentHours.equals("0") && !sentHours.equals("00")
+    ) || (
+      minutes == 0 && !sentMinutes.equals("0") && !sentMinutes.equals("00")
+    ) || (
+      day == 0 && !sentDay.equals("0") && !sentDay.equals("00")
+    )
   );
   if(sentValuesNotIsANumber){
     server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Horario inválido\"}");
     return;
   }
-  bool theSentTimeIsWithinADayRange = hours > 23 || minutes > 59;
+  bool theSentTimeIsWithinADayRange = hours > 23 || hours <0 || minutes > 59 || minutes <0 || day < 0 || day > 6;
   if(theSentTimeIsWithinADayRange){
     server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Horario inválido\"}");
     return;
   }
 
-	RTCController::configureClock(hours, minutes);
+	RTCController::configureClock(hours, minutes, day);
   server.send(200, "text/json", "{\"status\": \"success\"}");
 }
 

@@ -113,11 +113,47 @@ String Pages::clockAdjustPage(){
   buf += "  }";
   buf += "}";
 
+  buf += ".week-days {";
+  buf += "  display: grid;";
+  buf += "  width: 100%;";
+  buf += "  height: 100%;";
+  buf += "  grid-template-columns: repeat(7, 1fr);";
+  buf += "  flex-direction: row;";
+  buf += "  border: solid .5px #4039372a;";
+  buf += "  border-radius: 10px;";
+  buf += "}";
+
+  buf += ".week-day {";
+  buf += "  border: solid .5px #4039372a;";
+  buf += "  padding: 0.5rem;";
+  buf += "  font-size: 1.6rem;";
+  buf += "  display: flex;";
+  buf += "  justify-content: center;";
+  buf += "  align-itens: center;";
+  buf += "  background: none;";
+  buf += "}";
+
+  buf += "#selected-week-day {";
+  buf += "  color: #ffffff;";
+  buf += "  background-color: #8AC87F;";
+  buf += "}";
+
   buf += "</style>";
   buf += "<body>";
   buf += "    <div class='wrapper'>";
   buf += "        <div class='app'>";
-  buf += "            <h1>configure o relogio com o horario atual</h1>";
+  buf += "            <h1>configure a data e hora atual</h1>";
+  buf += "            <h1>dia de hoje:</h1>";
+  buf += "            <div class='week-days'>";
+  buf += "              <button class='week-day day-0' id='selected-week-day' onclick='selecionarDia(0)'>D</button>";
+  buf += "              <button class='week-day day-1' onclick='selecionarDia(1)'>S</button>";
+  buf += "              <button class='week-day day-2' onclick='selecionarDia(2)'>T</button>";
+  buf += "              <button class='week-day day-3' onclick='selecionarDia(3)'>Q</button>";
+  buf += "              <button class='week-day day-4' onclick='selecionarDia(4)'>Q</button>";
+  buf += "              <button class='week-day day-5' onclick='selecionarDia(5)'>S</button>";
+  buf += "              <button class='week-day day-6' onclick='selecionarDia(6)'>S</button>";
+  buf += "            </div>";
+
   buf += "            <h1>horario atual:</h1>";
   buf += "            <div class='timer'>";
   buf += "                <div class='timer-container'>";
@@ -146,6 +182,7 @@ String Pages::clockAdjustPage(){
   buf += "<script>";
   buf += "  let horas = 0\n";
   buf += "  let minutos = 0\n";
+  buf += "  let dia = 0\n";
   buf += "  function atualizarDisplay() {\n";
   buf += "      const displayMinutos = window.document.getElementById('minuto')\n";
   buf += "      const displayHoras = window.document.getElementById('hora')\n";
@@ -172,11 +209,20 @@ String Pages::clockAdjustPage(){
   buf += "      }\n";
   buf += "      atualizarDisplay()\n";
   buf += "  }";
+  buf += "  function selecionarDia(id){\n";
+  buf += "    const selectedDay = window.document.getElementById('selected-week-day');\n";
+  buf += "    if(selectedDay){\n";
+  buf += "      selectedDay.id = '';\n";
+  buf += "    }\n";
+  buf += "    const newSelectedDay = window.document.getElementsByClassName(`day-${id}`)[0]\n";
+  buf += "    newSelectedDay.id = 'selected-week-day'\n";
+  buf += "    dia = id;\n";
+  buf += "  }\n";
   buf += "  function cancelar(){\n";
   buf += "      window.location.replace('/')\n";
   buf += "  }\n";
   buf += "  async function confirmar(){\n";
-  buf += "    const response = await fetch(`/setar-relogio?hora=${horas}&minuto=${minutos}`);\n";
+  buf += "    const response = await fetch(`/setar-relogio?hora=${horas}&minuto=${minutos}&dia=${dia}`);\n";
   buf += "    if(response.status !== 200){\n";
   buf += "      const data = await response.json()\n";
   buf += "      alert(data.message);\n";

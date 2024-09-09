@@ -9,7 +9,7 @@
 
 String Pages::landingPage(){
   std::list<RoutineStruct> routines = RoutinesController::getRoutines();
-  std::array<int, 3> now = RTCController::getNow();
+  NowStruct now = RTCController::getNow();
   String buf = ""; 
 
   buf += "<html lang='pt-BR'>";
@@ -98,17 +98,39 @@ String Pages::landingPage(){
   buf += "    display: flex;";
   buf += "    flex-direction: column;";
   buf += "  }";
-  
-  buf += "  .routine {";
-  buf += "    display: flex;";
-  buf += "    flex-direction: row;";
-  buf += "    justify-content: center;";
-  buf += "    align-items: center;";
-  buf += "    border: solid .5px #4039372a;";
-  buf += "    border-radius: 10px;";
-  buf += "    padding: .5rem;";
-  buf += "    gap: 4rem;";
-  buf += "  }";
+  buf += ".routine {";
+  buf += "  display: flex;";
+  buf += "  flex-direction: column;";
+  buf += "  border: solid .5px #4039372a;";
+  buf += "  border-radius: 10px;";
+  buf += "  gap: 0;";
+  buf += "  padding: 0.4rem;";
+  buf += "}";
+  buf += ".routine-infos {";
+  buf += "  display: flex;";
+  buf += "  flex-direction: row;";
+  buf += "  justify-content: center;";
+  buf += "  align-items: center;";
+  buf += "  padding: .5rem;";
+  buf += "  gap: 4rem;";
+  buf += "}";
+  buf += ".week-days {";
+  buf += "  display: grid;";
+  buf += "  width: 100%;";
+  buf += "  height: 100%;";
+  buf += "  grid-template-columns: repeat(7, 1fr);";
+  buf += "  flex-direction: row;";
+  buf += "  border: solid .5px #4039372a;";
+  buf += "  border-radius: 10px;";
+  buf += "}";
+  buf += ".week-day {";
+  buf += "  padding: 0.5rem;";
+  buf += "  font-size: 1.6rem;";
+  buf += "}";
+  buf += ".disabled-week-day {";
+  buf += "  opacity: 0.2;";
+  buf += "  background: none;";
+  buf += "}";
   
   buf += "  .routine p {";
   buf += "    font-size: 2rem;";
@@ -296,7 +318,8 @@ String Pages::landingPage(){
     for(RoutineStruct routine: routines){
       bool relayIsOn = relays[routine.relayIndex-1].isOn;
 
-      buf += "          <div class='routine'>";
+      buf += "<div class='routine'>";
+      buf += "        <div class='routine-infos'>";
 
       buf += "<div class='portIdentifier ";
       buf += "portIdentifierN-"; 
@@ -334,6 +357,16 @@ String Pages::landingPage(){
       buf += "\")'";
       buf += "            > 🗑 </button>";
       buf += "        </div>";
+      buf += "<div class='week-days'>";
+      buf += "  <div class='week-day'>D</div>";
+      buf += "  <div class='week-day'>S</div>";
+      buf += "  <div class='week-day'>T</div>";
+      buf += "  <div class='week-day'>Q</div>";
+      buf += "  <div class='week-day'>Q</div>";
+      buf += "  <div class='week-day'>S</div>";
+      buf += "  <div class='week-day'>S</div>";
+      buf += "</div>";
+      buf += "        </div>";
     }
       buf += "</div>";
   } else {
@@ -349,10 +382,10 @@ String Pages::landingPage(){
   buf += "        <h1>horario atual:</h1>";
   buf += "        <div class='clock'>";
   buf += "          <div id='currentHour'>";
-  buf += numberToTwoChars(now[0]);
+  buf += numberToTwoChars(now.hour);
   buf += "          </div> <label class='clockSeparator'>:</label>";
   buf += "          <div id='currentMinute'>";
-  buf += numberToTwoChars(now[1]);
+  buf += numberToTwoChars(now.minute);
   buf += "          </div>";
   buf += "        </div>";
   buf += "      </div>";

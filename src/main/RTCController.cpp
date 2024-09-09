@@ -5,14 +5,18 @@
 
 RTC_DS3231 RTCController::rtc;
 
-std::array<int, 3> RTCController::getNow(){
+NowStruct RTCController::getNow(){
 	DateTime now = rtc.now();
   int hora = now.hour();
   int minuto = now.minute();
   int segundo = now.second();
-	return {hora, minuto, segundo};
+  int day = now.dayOfTheWeek(); 
+	return {hora, minuto, segundo, day};
 }
 
-void RTCController::configureClock(int hour, int minute){
-  rtc.adjust(DateTime(2021, 1, 21, hour, minute, 0));
+void RTCController::configureClock(int hour, int minute, int day){
+  // 08/09/2024 é um domingo. 
+  // Sendo day o dia da semana, começando por domingo = 0
+  // Somar day ao dia 8 resulta no dia da semana correto.
+  rtc.adjust(DateTime(2024, 9, 8+day, hour, minute, 0)); 
 }
