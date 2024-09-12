@@ -62,7 +62,7 @@ void loop(){
   if(lastMinuteInLoop != now.minute){
     String hours = numberToTwoChars(now.hour);
     String minutes = numberToTwoChars(now.minute);
-    String buf = "{ \"hora\" : \""+ hours + "\", \"minuto\" : \""+ minutes +"\" }";
+    String buf = "{ \"hora\" : \""+ hours + "\", \"minuto\" : \""+ minutes +"\", \"dia\": \""+RTCController::weekDays[now.day]+"\"}";
     webSocket.emitEvent("{\"event\": \"clockUpdate\", \"buffer\":"+buf+"}");
 
     lastMinuteInLoop = now.minute;

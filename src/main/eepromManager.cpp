@@ -5,22 +5,19 @@ void addRoutineInEEPROM(
   int minuteToTurnOn,
   int hourToTurnOff,
   int minuteToTurnOFF,
-  int relayIndex
+  int relayIndex,
+  int routineDays
 ){
   String routines = readRoutinesInEEPROM();
-  // A string contendo todas as rotinas é dividida em rotinas de tamanho "ROUTINE_LENGTH".
-  // Cada rotina é organizada em blocos de hora e minuto, tendo dois caracteres cada bloco.
-  // Sendo assim, todas as rotinas têm valor par.
-  // Cada bloco da rotina é dado por um valor entre 0 e 60, sendo salvo em um endereço da EEPROM
-  // Tornando viavel o seguinte cálculo:
   int firstEmptyAddresInEEPROM = routines.length()/2;
-  if(firstEmptyAddresInEEPROM+4 >= EEPROM_SIZE ){ return; }
+  if(firstEmptyAddresInEEPROM+NUMBER_OF_ROUTINE_PARTS >= EEPROM_SIZE ){ return; }
   EEPROM.begin(EEPROM_SIZE);
   EEPROM.write(firstEmptyAddresInEEPROM,   hourToTurnON);
   EEPROM.write(firstEmptyAddresInEEPROM+1, minuteToTurnOn);
   EEPROM.write(firstEmptyAddresInEEPROM+2, hourToTurnOff);
   EEPROM.write(firstEmptyAddresInEEPROM+3, minuteToTurnOFF);
   EEPROM.write(firstEmptyAddresInEEPROM+4, relayIndex);
+  EEPROM.write(firstEmptyAddresInEEPROM+5, routineDays);
   EEPROM.commit();
   EEPROM.end();    
 }

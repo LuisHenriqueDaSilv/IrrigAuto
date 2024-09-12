@@ -4,8 +4,8 @@ bool RoutinesController::createRoutine(
   RoutineStruct routine,
   int routineIndex
 ){
-  int firstEmptyAddressInEEPROM = routineIndex*(ROUTINE_LENGTH/2);
-  if(firstEmptyAddressInEEPROM+(ROUTINE_LENGTH/2) >= EEPROM_SIZE) { 
+  int firstEmptyAddressInEEPROM = routineIndex*(NUMBER_OF_ROUTINE_PARTS);
+  if(firstEmptyAddressInEEPROM+(NUMBER_OF_ROUTINE_PARTS) >= EEPROM_SIZE) { 
     return false; // Limit reached
   } 
   EEPROM.begin(EEPROM_SIZE);
@@ -14,6 +14,7 @@ bool RoutinesController::createRoutine(
   EEPROM.write(firstEmptyAddressInEEPROM+2, routine.hourToTurnOff);
   EEPROM.write(firstEmptyAddressInEEPROM+3, routine.minuteToTurnOff);
   EEPROM.write(firstEmptyAddressInEEPROM+4, routine.relayIndex);
+  EEPROM.write(firstEmptyAddressInEEPROM+5, routine.days);
   EEPROM.commit();
   EEPROM.end();
   return true; // Sucess
@@ -92,8 +93,9 @@ std::list<RoutineStruct> RoutinesController::getRoutines(){
     int hourToTurnOff   = EEPROM.read(EEPROMAddressCounter+2);
     int minuteToTurnOFF = EEPROM.read(EEPROMAddressCounter+3);
     int relayIndex      = EEPROM.read(EEPROMAddressCounter+4);
+    int routineDays      = EEPROM.read(EEPROMAddressCounter+5);
 
-    if( hourToTurnON == 0 && minuteToTurnOn == 0 && hourToTurnOff == 0 && minuteToTurnOFF == 0 ) {
+    if( hourToTurnON == 0 && minuteToTurnOn == 0 && hourToTurnOff == 0 && minuteToTurnOFF == 0 && relayIndex == 0 && routineDays == 0 ) {
       endOfEEPROM = true;
       continue;
     }
@@ -102,10 +104,11 @@ std::list<RoutineStruct> RoutinesController::getRoutines(){
       minuteToTurnOn,
       hourToTurnOff,
       minuteToTurnOFF,
-      relayIndex
+      relayIndex,
+      routineDays
     };
     listOfRoutines.push_back(newRoutine);
-    EEPROMAddressCounter += ROUTINE_LENGTH/2;
+    EEPROMAddressCounter += NUMBER_OF_ROUTINE_PARTS+1;
   }
   EEPROM.end();
 

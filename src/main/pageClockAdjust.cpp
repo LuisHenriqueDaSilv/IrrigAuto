@@ -37,6 +37,7 @@ String Pages::clockAdjustPage(){
   buf += ".app {";
   buf += "  min-height: 100vh;";
   buf += "  max-width: 97.4rem;";
+  buf += "  width: 100%;";
   buf += "  padding: 2rem 1rem;";
   buf += "  background-color: #D9D9D9;";
   buf += "  display: flex;";
@@ -102,15 +103,11 @@ String Pages::clockAdjustPage(){
   buf += "  font-size: 2rem;";
   buf += "  text-decoration: none;";
   buf += "  transition: 200ms;";
+  buf += "  cursor: pointer;";
   buf += "}";
   buf += "#cancel-button {";
   buf += "  border-radius: 0 10px 10px 0;";
   buf += "  background-color: #B2433B;";
-  buf += "}";
-  buf += "@media (max-width: 952px) {";
-  buf += "  .app {";
-  buf += "    width: 100vw;";
-  buf += "  }";
   buf += "}";
 
   buf += ".week-days {";
@@ -124,6 +121,7 @@ String Pages::clockAdjustPage(){
   buf += "}";
 
   buf += ".week-day {";
+  buf += "  cursor: pointer;";
   buf += "  border: solid .5px #4039372a;";
   buf += "  padding: 0.5rem;";
   buf += "  font-size: 1.6rem;";

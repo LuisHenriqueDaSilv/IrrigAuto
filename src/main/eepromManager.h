@@ -6,7 +6,8 @@
   #include "utils.h"
 
   constexpr int EEPROM_SIZE = 512;
-  constexpr int ROUTINE_LENGTH = 10;
+  constexpr int ROUTINE_LENGTH = 13;
+  constexpr int NUMBER_OF_ROUTINE_PARTS = 5;
 
   void addRoutineInEEPROM(
     int hourToTurnON,

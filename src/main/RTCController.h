@@ -14,5 +14,6 @@
       static RTC_DS3231 rtc;
       static NowStruct getNow();
       static void configureClock(int hour, int minute, int day);
+      static String weekDays[7]; 
   };
 #endif

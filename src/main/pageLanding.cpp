@@ -271,6 +271,13 @@ String Pages::landingPage(){
   buf += "  font-size: 1.3rem;";
   buf += "}";
 
+  buf += ".day-of-week {";
+  buf += "  border: solid .5px #4039372a;";
+  buf += "  border-radius: 10px;";
+  buf += "  padding: 1rem;";
+  buf += "  font-size: 1.8rem;";
+  buf += "}";
+
   buf += "</style>";
   
   buf += "<body>";
@@ -358,13 +365,14 @@ String Pages::landingPage(){
       buf += "            > 🗑 </button>";
       buf += "        </div>";
       buf += "<div class='week-days'>";
-      buf += "  <div class='week-day'>D</div>";
-      buf += "  <div class='week-day'>S</div>";
-      buf += "  <div class='week-day'>T</div>";
-      buf += "  <div class='week-day'>Q</div>";
-      buf += "  <div class='week-day'>Q</div>";
-      buf += "  <div class='week-day'>S</div>";
-      buf += "  <div class='week-day'>S</div>";
+      String routineDaysBinary = String(routine.days, BIN);
+      buf += String("  <div class='week-day ") + (routineDaysBinary.charAt(0) == '1' ? "onButton" : ".") + "'>D</div>";
+      buf += String("  <div class='week-day ") + (routineDaysBinary.charAt(1) == '1' ? "onButton" : ".") + "'>S</div>";
+      buf += String("  <div class='week-day ") + (routineDaysBinary.charAt(2) == '1' ? "onButton" : ".") + "'>T</div>";
+      buf += String("  <div class='week-day ") + (routineDaysBinary.charAt(3) == '1' ? "onButton" : ".") + "'>Q</div>";
+      buf += String("  <div class='week-day ") + (routineDaysBinary.charAt(4) == '1' ? "onButton" : ".") + "'>Q</div>";
+      buf += String("  <div class='week-day ") + (routineDaysBinary.charAt(5) == '1' ? "onButton" : ".") + "'>S</div>";
+      buf += String("  <div class='week-day ") + (routineDaysBinary.charAt(6) == '1' ? "onButton" : ".") + "'>S</div>";
       buf += "</div>";
       buf += "        </div>";
     }
@@ -379,7 +387,12 @@ String Pages::landingPage(){
   buf += "      </div>";
   
   buf += "      <div>";
-  buf += "        <h1>horario atual:</h1>";
+  buf += "        <h1>data e hora:</h1>";
+  buf += "        <div>";
+  buf += "        <div id='day-of-week' class='day-of-week'>";
+  buf += RTCController::weekDays[now.day];
+  // buf += "          terça feira";
+  buf += "        </div>";
   buf += "        <div class='clock'>";
   buf += "          <div id='currentHour'>";
   buf += numberToTwoChars(now.hour);
@@ -388,6 +401,7 @@ String Pages::landingPage(){
   buf += numberToTwoChars(now.minute);
   buf += "          </div>";
   buf += "        </div>";
+  buf += "      </div>";
   buf += "      </div>";
   buf += "      <a href='/configurar-relogio'>configurar relogio</a>";
   buf += "      <a href='/rede'>configurar rede</a>";
@@ -425,6 +439,7 @@ String Pages::landingPage(){
   buf += "function updateClockDisplay(currentDate){\n";
   buf += "  window.document.getElementById('currentHour').innerHTML = currentDate.hora\n";
   buf += "  window.document.getElementById('currentMinute').innerHTML = currentDate.minuto\n";
+  buf += "  window.document.getElementById('day-of-week').innerHTML = currentDate.dia\n";
   buf += "}\n";
 
   buf += "socket.onmessage = (event) => {\n";

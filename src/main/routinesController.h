@@ -14,13 +14,15 @@
     int hourToTurnOff;
     int minuteToTurnOff;
     int relayIndex;
+    int days;
     bool operator==(const RoutineStruct& other) const {
       return (
         hourToTurnOn == other.hourToTurnOn && 
         minuteToTurnOn == other.minuteToTurnOn && 
         hourToTurnOff == other.hourToTurnOff && 
         minuteToTurnOff == other.minuteToTurnOff && 
-        relayIndex == other.relayIndex
+        relayIndex == other.relayIndex&& 
+        days == other.days
       );
     }
   };

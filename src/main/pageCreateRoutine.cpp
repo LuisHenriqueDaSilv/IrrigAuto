@@ -39,6 +39,7 @@ String Pages::createRoutinePage(){
   buf += ".app {";
   buf += "  min-height: 100vh;";
   buf += "  max-width: 97.4rem;";
+  buf += "  width: 100%;";
   buf += "  padding: 2rem 1rem;";
   buf += "  background-color: #D9D9D9;";
   buf += "  display: flex;";
@@ -117,6 +118,7 @@ String Pages::createRoutinePage(){
   buf += "  font-size: 2rem;";
   buf += "  text-decoration: none;";
   buf += "  transition: 200ms;";
+  buf += "  cursor: pointer;";
   buf += "}";
   buf += "#cancel-button {";
   buf += "  border-radius: 0 10px 10px 0;";
@@ -188,6 +190,29 @@ String Pages::createRoutinePage(){
   buf += "  color: #ffffff;";
   buf += "  background-color: #8AC87F;";
   buf += "}";
+  buf += ".week-days {";
+  buf += "  display: grid;";
+  buf += "  width: 100%;";
+  buf += "  height: 100%;";
+  buf += "  grid-template-columns: repeat(7, 1fr);";
+  buf += "  flex-direction: row;";
+  buf += "  border: solid .5px #4039372a;";
+  buf += "  border-radius: 10px;";
+  buf += "}";
+  buf += ".week-day {";
+  buf += "  cursor: pointer;";
+  buf += "  border: solid .5px #4039372a;";
+  buf += "  padding: 0.5rem;";
+  buf += "  font-size: 1.6rem;";
+  buf += "  display: flex;";
+  buf += "  justify-content: center;";
+  buf += "  align-itens: center;";
+  buf += "  background: none;";
+  buf += "}";
+  buf += "#selected-week-day {";
+  buf += "  color: #ffffff;";
+  buf += "  background-color: #8AC87F;";
+  buf += "}";
 
 
   buf += "</style>";
@@ -196,10 +221,7 @@ String Pages::createRoutinePage(){
   buf += "        <div class='app'>";
   buf += "            <h1>configurar rotina</h1>";
   buf += "            <div class='header'>";
-
-  buf += "      <p>";
-  buf += "        Selecionar porta";
-  buf += "      </p>";
+  buf += "              <h1>Selecionar porta</h1>";
   buf += "              <div class='relaysContainer'>";
   for(int i = 0; i<NUMBER_OF_RELAYS; i++){
     buf += "        <button class='selectRelayButton ";
@@ -215,6 +237,16 @@ String Pages::createRoutinePage(){
 
   buf += "      </div>";
   buf += "    </div>  ";
+  buf += "            <h1>dias em que a rotina funcionara</h1>";
+  buf += "            <div class='week-days'>";
+  buf += "              <button class='week-day day-0' id='selected-week-day' onclick='selectDay(0)'>D</button>";
+  buf += "              <button class='week-day day-1' id='selected-week-day' onclick='selectDay(1)'>S</button>";
+  buf += "              <button class='week-day day-2' id='selected-week-day' onclick='selectDay(2)'>T</button>";
+  buf += "              <button class='week-day day-3' id='selected-week-day' onclick='selectDay(3)'>Q</button>";
+  buf += "              <button class='week-day day-4' id='selected-week-day' onclick='selectDay(4)'>Q</button>";
+  buf += "              <button class='week-day day-5' id='selected-week-day' onclick='selectDay(5)'>S</button>";
+  buf += "              <button class='week-day day-6' id='selected-week-day' onclick='selectDay(6)'>S</button>";
+  buf += "            </div>";
   buf += "            <div class='timers-container'>";
   buf += "                <div class='timer'>";
   buf += "                    <h1>liga:</h1>";
@@ -265,6 +297,7 @@ String Pages::createRoutinePage(){
   buf += "    </div>";
   buf += "</body>";
   buf += "<script>";
+  buf += "  const selectedDays = [1,1,1,1,1,1,1];\n";
   buf += "  let relayId;\n";
   buf += "  function selectRelay(id){\n";
   buf += "    const manualButton = window.document.getElementById(`selectRelayButton-${id}`)\n";
@@ -275,6 +308,16 @@ String Pages::createRoutinePage(){
   buf += "    }\n";
   buf += "    relayId = id\n";
   buf += "  }\n";
+  buf += "function selectDay(id){\n";
+  buf += "  const selectedDay = window.document.getElementsByClassName(`day-${id}`)[0]\n";
+  buf += "  if(selectedDays[id] == 1){\n";
+  buf += "    selectedDays[id] = 0\n";
+  buf += "    selectedDay.id = ''; \n";
+  buf += "  } else {\n";
+  buf += "    selectedDays[id] = 1\n";
+  buf += "    selectedDay.id = 'selected-week-day';\n";
+  buf += "  }\n";
+  buf += "}\n";
   buf += "  let horasLiga = 0\n";
   buf += "  let minutosLiga = 0\n";
   buf += "  function atualizarDisplayLiga() {\n";
@@ -342,7 +385,11 @@ String Pages::createRoutinePage(){
   buf += "      alert('Porta não selecionada')\n";
   buf += "      return\n";
   buf += "    }\n";
-  buf += "    const response = await fetch(`/adicionar-rotina?rotina=${ftd(horasLiga)}${ftd(minutosLiga)}${ftd(horasDesliga)}${ftd(minutosDesliga)}${ftd(relayId)}`);\n";
+  buf += "    if(selectedDays.indexOf(1) == -1){\n";
+  buf += "      alert('Escolha ao menos um dia para que a rotina funcione')\n";
+  buf += "      return\n";
+  buf += "    }\n";
+  buf += "    const response = await fetch(`/adicionar-rotina?rotina=${ftd(horasLiga)}${ftd(minutosLiga)}${ftd(horasDesliga)}${ftd(minutosDesliga)}${ftd(relayId)}&dias=${selectedDays.toString().replaceAll(',', '')}`);\n";
   buf += "    if(response.status != 200){\n";
   buf += "      const data = await response.json();\n";
   buf += "      alert(data.message)\n";
