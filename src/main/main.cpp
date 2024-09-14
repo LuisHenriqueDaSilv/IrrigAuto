@@ -77,7 +77,26 @@ void loop(){
         int minuteOfTheDayToTurnOn = (routine.hourToTurnOn*60) + routine.minuteToTurnOn;
         int minuteOfTheDayToTurnOff = (routine.hourToTurnOff*60) + routine.minuteToTurnOff;
 
-        if(!portsStatus[routine.relayIndex-1]){
+        String routineDaysBinary = String(routine.days, BIN);
+        if(routineDaysBinary.length() < 7){
+          int numberOfZeros = 7 - routineDaysBinary.length();
+          String complement = "";
+          for(int i = 0; i< numberOfZeros; i++){
+            complement+="0";
+          }
+          routineDaysBinary = complement+routineDaysBinary;
+        }
+
+
+        bool routineIsActivedToday = false;
+        // So o dia atual está ativo na rotina
+
+        // Se estava no dia anterior e estamos no intervalo antes da hora de desligar
+        int previousDayIndex = now.day == 0? 6:now.day-1;
+        routineIsActivedToday = routineDaysBinary.charAt(now.day) == '1' || (minuteOfTheDayToTurnOff < minuteOfTheDayToTurnOn && routineDaysBinary.charAt(previousDayIndex) == '1');
+
+        if(routineIsActivedToday){
+          if(!portsStatus[routine.relayIndex-1]){
             portsStatus[routine.relayIndex-1] = RoutinesController::shouldItbeTurnedOn(
               currentMinuteOfTheDay, 
               minuteOfTheDayToTurnOn, 
@@ -85,7 +104,10 @@ void loop(){
               relays[routine.relayIndex-1].manuallyTurnedOn,
               relays[routine.relayIndex-1].manuallyTurnedOff
             );
+          }
         }
+
+
       }
 
       for(int i = 0; i< NUMBER_OF_RELAYS; i++){
@@ -113,7 +135,6 @@ void loop(){
       if(status == 1){ relays[i].manuallyToggleRelayState(); } 
     }
   }
-  
   if(changeWifiButtonStatus && !resetWifi && millis() - lastChangeWifiClick > 5000){
     
     WifiManager::initWifiResetProcess();

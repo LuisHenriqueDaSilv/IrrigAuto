@@ -35,7 +35,7 @@ void HTTPServer::handleConfigureClockRequest(WebServer& server){
   
   bool lengthOfSentValuesIsInvalid = ( 
     (sentHours.isEmpty() || sentMinutes.isEmpty() || sentDay.isEmpty()) && 
-    (sentHours.length() > 2 || sentMinutes.length() > 2 || sentDay.length() > 1)
+    (sentHours.length() != 2 || sentMinutes.length() != 2 || sentDay.length() != 1)
   ); 
   if(lengthOfSentValuesIsInvalid){
     server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Horario inválido\"}");
@@ -71,7 +71,7 @@ void HTTPServer::handleConfigureClockRequest(WebServer& server){
 void HTTPServer::handleToggleRelayRequest(WebServer& server){
 
   String sentId = server.arg(0);
-  bool lengthOfSentIdIsInvalid = sentId.isEmpty() || sentId.length() > 1;
+  bool lengthOfSentIdIsInvalid = sentId.isEmpty() || sentId.length() != 1;
   if(lengthOfSentIdIsInvalid){
     server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Id inválido\"}");
     return;
@@ -94,15 +94,16 @@ void HTTPServer::handleToggleRelayRequest(WebServer& server){
 
 void HTTPServer::handleDeleteRoutineRequest(WebServer& server){
   String data = server.arg(0);
-  bool sentDataLengthIsInvalid = data.isEmpty() || data.length() > ROUTINE_LENGTH;
+  String routineDays = server.arg(1);
+  bool sentDataLengthIsInvalid = data.isEmpty() || data.length() != 10;
   if(sentDataLengthIsInvalid){
     server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Rotina inválida\"}");
     return;
   }
 
-  int sentValues[4];
+  int sentValues[5];
   bool someSentCharIsNotANumber = false;
-  for(int i = 0; i<NUMBER_OF_ROUTINE_PARTS; i+=2){
+  for(int i = 0; i<NUMBER_OF_ROUTINE_PARTS*2; i+=2){
     String valueString = data.substring(i, i+2);
     int valueInt = atoi(valueString.c_str());
     if(valueInt == 0 && !valueString.equals("0") && !valueString.equals("00")){
@@ -117,12 +118,32 @@ void HTTPServer::handleDeleteRoutineRequest(WebServer& server){
     return;
   }
 
+  bool sentRoutineDaysIsInvalid = routineDays.isEmpty() || routineDays.length() != 7;
+  if(sentRoutineDaysIsInvalid){
+    server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Dias escolhidos invalidos\"}");
+    return;
+  }
+
+  bool routineDaysIsInvalid = false;
+  for (int i = 0; i < routineDays.length(); i++) {
+      if (routineDays.charAt(i) != '0' && routineDays.charAt(i) != '1') {
+        routineDaysIsInvalid = true;
+        break;
+      }
+  }
+  if(routineDaysIsInvalid){
+    server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Dias escolhidos invalidos\"}");
+    return;
+  }
+
+  int routineDaysInt = strtol(routineDays.c_str(), 0, 2);
   RoutineStruct routineToDelete = {
     sentValues[0],
     sentValues[1],
     sentValues[2],
     sentValues[3],
-    sentValues[4]
+    sentValues[4],
+    routineDaysInt
   }; 
   bool routineExist = RoutinesController::routineExist(routineToDelete);
   if(!routineExist){
@@ -157,12 +178,12 @@ void HTTPServer::handleReadAllRoutinesRequest(WebServer& server){
 void HTTPServer::handleCreateRoutineRequest(WebServer& server){
   String routine = server.arg(0);
   String routineDays = server.arg(1);
-  bool sentDataLengthIsInvalid = routine.isEmpty() || routine.length() > ROUTINE_LENGTH;
+  bool sentDataLengthIsInvalid = routine.isEmpty() || routine.length() != 10;
   if(sentDataLengthIsInvalid){  
     server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Rotina invalida\"}");
     return;
   }
-  bool sentRoutineDaysIsInvalid = routineDays.isEmpty() || routineDays.length() > 7;
+  bool sentRoutineDaysIsInvalid = routineDays.isEmpty() || routineDays.length() != 7;
   if(sentRoutineDaysIsInvalid){
     server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Dias escolhidos invalidos\"}");
     return;
@@ -191,11 +212,16 @@ void HTTPServer::handleCreateRoutineRequest(WebServer& server){
     }
     sentValues[i/2] = valueInt;
   }
-
   if(someSentCharIsNotANumber){
     server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Rotina inválida\"}");
     return;
   }
+  
+  // RelayId[4] = RelayId;
+  if(sentValues[4] < 1 || sentValues[4] > NUMBER_OF_RELAYS){
+    server.send(400, "text/json", "{\"status\": \"error\", \"message\": \"Porta invalida\"}");
+    return;
+  } 
 
   int routineDaysToInt = strtol(routineDays.c_str(), 0, 2);
   RoutineStruct newRoutine = {

@@ -4,7 +4,7 @@ bool RoutinesController::createRoutine(
   RoutineStruct routine,
   int routineIndex
 ){
-  int firstEmptyAddressInEEPROM = routineIndex*(NUMBER_OF_ROUTINE_PARTS);
+  int firstEmptyAddressInEEPROM = routineIndex*(NUMBER_OF_ROUTINE_PARTS+1);
   if(firstEmptyAddressInEEPROM+(NUMBER_OF_ROUTINE_PARTS) >= EEPROM_SIZE) { 
     return false; // Limit reached
   } 

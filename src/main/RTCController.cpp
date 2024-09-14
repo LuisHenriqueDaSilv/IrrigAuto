@@ -4,7 +4,7 @@
 #include "utils.h"
 
 RTC_DS3231 RTCController::rtc;
-String RTCController::weekDays[7] = {"Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sabado", "Domingo"};
+String RTCController::weekDays[7] = {"Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sabado"};
 NowStruct RTCController::getNow(){
 	DateTime now = rtc.now();
   int hora = now.hour();

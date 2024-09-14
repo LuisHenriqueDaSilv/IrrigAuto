@@ -144,6 +144,7 @@ String Pages::landingPage(){
   buf += "    background: #B55454;";
   buf += "    border: none;";
   buf += "    border-radius: 10px;";
+  buf += "    cursor: pointer;";
   buf += "  }";
   
   buf += "  .routinesFooter {";
@@ -324,6 +325,15 @@ String Pages::landingPage(){
     
     for(RoutineStruct routine: routines){
       bool relayIsOn = relays[routine.relayIndex-1].isOn;
+      String routineDaysBinary = String(routine.days, BIN);
+      if(routineDaysBinary.length() < 7){
+        int numberOfZeros = 7 - routineDaysBinary.length();
+        String complement = "";
+        for(int i = 0; i< numberOfZeros; i++){
+          complement+="0";
+        }
+        routineDaysBinary = complement+routineDaysBinary;
+      }
 
       buf += "<div class='routine'>";
       buf += "        <div class='routine-infos'>";
@@ -361,11 +371,11 @@ String Pages::landingPage(){
       buf += numberToTwoChars(routine.hourToTurnOff);
       buf += numberToTwoChars(routine.minuteToTurnOff);
       buf += numberToTwoChars(routine.relayIndex);
+      buf += routineDaysBinary;
       buf += "\")'";
       buf += "            > 🗑 </button>";
       buf += "        </div>";
       buf += "<div class='week-days'>";
-      String routineDaysBinary = String(routine.days, BIN);
       buf += String("  <div class='week-day ") + (routineDaysBinary.charAt(0) == '1' ? "onButton" : ".") + "'>D</div>";
       buf += String("  <div class='week-day ") + (routineDaysBinary.charAt(1) == '1' ? "onButton" : ".") + "'>S</div>";
       buf += String("  <div class='week-day ") + (routineDaysBinary.charAt(2) == '1' ? "onButton" : ".") + "'>T</div>";
@@ -466,11 +476,12 @@ String Pages::landingPage(){
   buf += "  const turnOnMinute = routine.slice(2, 4)\n";
   buf += "  const turnOffHour  = routine.slice(4, 6)\n";
   buf += "  const turnOffMinute = routine.slice(6, 8)\n";
-  buf += "  console.log(routine)\n";
+  buf += "  const relayIndex = routine.slice(8, 10)\n";
+  buf += "  const days = routine.slice(10, 17)\n";
   buf += "  const usuarioConfirmouAExclusao = confirm(`deseja mesmo excluir a rotina de ${turnOnHour}:${turnOnMinute} até ${turnOffHour}:${turnOffMinute}?`)\n";
   buf += "  if (usuarioConfirmouAExclusao) {\n";
-  buf += "    const horarioFormatadoParaEnvio = `${routine}`\n";
-  buf += "    const response = await fetch(`/excluir-rotina?horario=${horarioFormatadoParaEnvio}`);\n";
+  buf += "    const horarioFormatadoParaEnvio = `${turnOnHour}${turnOnMinute}${turnOffHour}${turnOffMinute}${relayIndex}`\n";
+  buf += "    const response = await fetch(`/excluir-rotina?horario=${horarioFormatadoParaEnvio}&dias=${days}`);\n";
   buf += "    if(response.status!= 200){\n";
   buf += "      const data = await response.json()\n";
   buf += "      alert(data.message);\n";
