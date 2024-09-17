@@ -209,6 +209,7 @@ String Pages::landingPage(){
   buf += ".relayManualButton {";
   buf += "  border: 2px solid #ffffff;";
   buf += "  padding: 0.5rem;";
+  buf += "  width: 8rem;";
   buf += "  border-radius: 0;";
   buf += "  color: #ffffff;";
   buf += "  background-color: #dfdfdf;";
