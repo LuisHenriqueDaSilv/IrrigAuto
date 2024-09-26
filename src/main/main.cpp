@@ -56,10 +56,18 @@ int lastMinuteInLoop = -1;
 int lastChangeWifiClick = 0;
 int changeWifiButtonStatus = 0;
 bool resetWifi = false;
+long lastBlink = millis();
+bool STAIndicatorIsOn = true;
+
 void loop(){
   
   NowStruct now = RTCController::getNow();
   if(lastMinuteInLoop != now.minute){
+
+    //millis() > 86400000
+    // if(millis() > 120000){
+    //   esp_restart();
+    // }
     String hours = numberToTwoChars(now.hour);
     String minutes = numberToTwoChars(now.minute);
     String buf = "{ \"hora\" : \""+ hours + "\", \"minuto\" : \""+ minutes +"\", \"dia\": \""+RTCController::weekDays[now.day]+"\"}";
@@ -89,14 +97,16 @@ void loop(){
 
 
         bool routineIsActivedToday = false;
-        // So o dia atual está ativo na rotina
-
-        // Se estava no dia anterior e estamos no intervalo antes da hora de desligar
         int previousDayIndex = now.day == 0? 6:now.day-1;
         routineIsActivedToday = routineDaysBinary.charAt(now.day) == '1' || (minuteOfTheDayToTurnOff < minuteOfTheDayToTurnOn && routineDaysBinary.charAt(previousDayIndex) == '1');
 
         if(routineIsActivedToday){
           if(!portsStatus[routine.relayIndex-1]){
+
+            if(currentMinuteOfTheDay == minuteOfTheDayToTurnOff || currentMinuteOfTheDay == minuteOfTheDayToTurnOn){
+              relays[routine.relayIndex-1].manuallyTurnedOn = false;
+              relays[routine.relayIndex-1].manuallyTurnedOff = false;
+            }
             portsStatus[routine.relayIndex-1] = RoutinesController::shouldItbeTurnedOn(
               currentMinuteOfTheDay, 
               minuteOfTheDayToTurnOn, 
@@ -105,11 +115,13 @@ void loop(){
               relays[routine.relayIndex-1].manuallyTurnedOff
             );
           }
-        }
-
+        } 
 
       }
 
+      for(int i =0; i<NUMBER_OF_RELAYS; i++){
+        if(relays[i].manuallyTurnedOn){ portsStatus[i] = true; }
+      }
       for(int i = 0; i< NUMBER_OF_RELAYS; i++){
         if(portsStatus[i] && !relays[i].isOn){ relays[i].turnOn(); }
         else if(!portsStatus[i] && relays[i].isOn) { relays[i].turnOff(); }
@@ -129,6 +141,38 @@ void loop(){
     }
   }
 
+  if(WifiManager::WifiMode == "STA"){
+
+    if(WiFi.status() != WL_CONNECTED){
+      if(millis()-lastBlink > 700){
+        if(STAIndicatorIsOn){
+          digitalWrite(WifiManager::STAIndicatorLedPort, LOW);
+          STAIndicatorIsOn =false;
+        } else {
+          digitalWrite(WifiManager::STAIndicatorLedPort, HIGH);
+          STAIndicatorIsOn = true;
+        }
+        lastBlink = millis();
+      }
+    } else {
+      digitalWrite(WifiManager::STAIndicatorLedPort, HIGH);
+
+    }
+  }
+    // while (WiFi.status() != WL_CONNECTED) {
+    //   if(millis()-lastBlink > 700){
+    //     if(STAIndicatorIsOn){
+    //       digitalWrite(STAIndicatorLedPort, LOW);
+    //       STAIndicatorIsOn =false;
+    //     } else {
+    //       digitalWrite(STAIndicatorLedPort, HIGH);
+    //       STAIndicatorIsOn = true;
+    //     }
+    //     lastBlink = millis();
+    //   }
+    // }
+
+
   if (xSemaphoreTake(toggleRelayInterruptionSemaphore, 0) == pdTRUE) {
     for(int i =0; i<NUMBER_OF_RELAYS; i++){
       int status = digitalRead(relays[i].buttonPort);
@@ -136,7 +180,6 @@ void loop(){
     }
   }
   if(changeWifiButtonStatus && !resetWifi && millis() - lastChangeWifiClick > 5000){
-    
     WifiManager::initWifiResetProcess();
     resetWifi = true;
   }

@@ -15,6 +15,7 @@
 			static String defaultPassword;
 			static String defaultSSID;
 			static String defaultAlias;
+			static String WifiMode;
 
 			static void begin();
 			static void saveWifiInfos(String ssid, String password, String mode);

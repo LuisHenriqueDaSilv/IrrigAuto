@@ -7,6 +7,7 @@ int WifiManager::changeWifiModeButtonPort = 15;
 String WifiManager::defaultPassword = "123456789";
 String WifiManager::defaultSSID = "Automada";
 String WifiManager::defaultAlias = "automada";
+String WifiManager::WifiMode = WifiManager::getWifiInfos()[2];
 
 void WifiManager::begin(){
   pinMode(STAIndicatorLedPort, OUTPUT);
@@ -15,16 +16,13 @@ void WifiManager::begin(){
   attachInterrupt(digitalPinToInterrupt(changeWifiModeButtonPort), handleChangeWifiModeInterruption, CHANGE);
 
   std::array<String, 3> infos =  getWifiInfos();
+  WifiMode = infos[2];
   
 
   if(infos[2].equals("STA")){
     WiFi.begin(infos[0], infos[1]);
-    digitalWrite(STAIndicatorLedPort, HIGH);
     digitalWrite(APIndicatorLedPort, LOW);
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(1000);
-      Serial.println("Conectando");
-    }
+    digitalWrite(STAIndicatorLedPort, HIGH);
   } else {
     digitalWrite(APIndicatorLedPort, HIGH);
     digitalWrite(STAIndicatorLedPort, LOW);

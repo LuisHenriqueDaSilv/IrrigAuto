@@ -21,8 +21,6 @@ bool RoutinesController::createRoutine(
 }
 
 void RoutinesController::saveRoutines(std::list<RoutineStruct> routines){
-  Serial.print("Salvando");
-  Serial.print(routines.size());
   int i = 0;
   for(RoutineStruct routine: routines){
     bool creationSucess = createRoutine(routine, i);
@@ -42,7 +40,6 @@ bool RoutinesController::delete_(RoutineStruct routineToDelete){
   std::list<RoutineStruct> routines = getRoutines();
   for(RoutineStruct routine: routines){
     if( routine == routineToDelete ){
-      Serial.println("Encontrei");
       routines.remove(routineToDelete);
       deleteAll();
       saveRoutines(routines);
